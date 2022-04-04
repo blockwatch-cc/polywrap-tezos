@@ -3,6 +3,7 @@ enum GetOperationStatusSupportedNetworks {
   mainnet
   hangzhounet
   granadanet
+  ithacanet
 }
 
 """ Describes a tezos account """

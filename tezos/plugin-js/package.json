@@ -32,6 +32,7 @@
     "axios": "0.25.0"
   },
   "devDependencies": {
+    "@blockwatch-cc/tezos-test-env": "0.0.1-prealpha.63",
     "@types/jest": "26.0.8",
     "@web3api/client-js": "0.0.1-prealpha.61",
     "@web3api/ens-plugin-js": "0.0.1-prealpha.61",
