@@ -1,7 +1,7 @@
 {
   "name": "@blockwatch-cc/tezos-domains-plugin-js",
   "description": "Tezos Domains Polywrapper JS Plugin",
-  "version": "0.0.1-prealpha.58",
+  "version": "0.0.1-prealpha.59",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -21,11 +21,11 @@
     "test:watch": "jest --watch --passWithNoTests --verbose"
   },
   "dependencies": {
-    "@taquito/taquito": "10.2.1",
-    "@taquito/tzip16": "10.2.1",
-    "@taquito/utils": "10.2.1",
-    "@tezos-domains/core": "1.9.0",
-    "@tezos-domains/taquito-client": "1.9.0",
+    "@taquito/taquito": "12.1.0",
+    "@taquito/tzip16": "12.1.0",
+    "@taquito/utils": "12.1.0",
+    "@tezos-domains/core": "1.14.0-alpha.3",
+    "@tezos-domains/taquito-client": "1.14.0-alpha.3",
     "@web3api/core-js": "0.0.1-prealpha.61",
     "sha.js": "2.4.11"
   },

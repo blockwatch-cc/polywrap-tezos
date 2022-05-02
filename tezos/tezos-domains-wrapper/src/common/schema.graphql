@@ -6,6 +6,7 @@ enum Network {
   mainnet
   granadanet
   hangzhounet
+  ithacanet
 }
 
 """ Describes domain information """

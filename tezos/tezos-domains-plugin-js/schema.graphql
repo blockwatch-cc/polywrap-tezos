@@ -2,6 +2,7 @@
 enum Network {
   mainnet
   hangzhounet
+  ithacanet
 }
 
 """ State of domain acquisition """
