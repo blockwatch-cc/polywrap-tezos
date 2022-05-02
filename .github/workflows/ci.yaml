@@ -145,7 +145,7 @@ jobs:
         run: yarn test
     #
 
-    # Tezos
+    # Tezos / test
       - name: (Tezos Test Env Wrapper) Read .nvmrc
         run: echo ::set-output name=NVMRC::$(cat .nvmrc)
         id: tezos-nvm
