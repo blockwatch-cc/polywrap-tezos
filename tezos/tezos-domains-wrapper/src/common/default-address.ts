@@ -16,4 +16,7 @@ DefaultAddresses.set("Hangzhounet.Commit", "KT1CEX6h5wxXMJ1f24ZZ8woDTmamZqPzcU5x
 DefaultAddresses.set("Hangzhounet.Buy", "KT1UdLszZbWarYKvb364dW77Gxi7m74TuAHL");
 DefaultAddresses.set("Hangzhounet.NameRegistry", "KT1MgQjmWMBQ4LyuMAqZccTkMSUJbEXeGqii");
 
-
+// Ithacanet
+DefaultAddresses.set("Ithacanet.Commit", "KT1WffvKqRGaPtVWYR1ZkG2GQY42B7a8x3kk");
+DefaultAddresses.set("Ithacanet.Buy", "KT1Fea9sCJ4BKjEYHLoEja7JuhXxKZkv9XDp");
+DefaultAddresses.set("Ithacanet.NameRegistry", "KT1GFYUFQRT4RsNbtG2NU23woUyMp5tx9gx2");
