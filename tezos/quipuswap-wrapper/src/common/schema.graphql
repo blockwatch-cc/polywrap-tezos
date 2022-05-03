@@ -5,6 +5,7 @@ enum Network {
   custom
   mainnet
   hangzhounet
+  ithacanet
 }
 
 """ CustomConnection """

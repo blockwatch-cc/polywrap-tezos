@@ -17,7 +17,7 @@
     "deploy:web3api": "npx w3 build --ipfs http://localhost:5001 --test-ens harbinger.web3api.eth"
   },
   "devDependencies": {
-    "@blockwatch-cc/tezos-plugin-js": "0.0.1-prealpha.62",
+    "@blockwatch-cc/tezos-plugin-js": "0.0.1-prealpha.63",
     "@types/jest": "27.4.0",
     "@types/node": "17.0.8",
     "@web3api/cli": "0.0.1-prealpha.61",

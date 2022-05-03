@@ -1,6 +1,4 @@
 import { Network, Tezos_Connection } from "../query/w3";
-const SupportedNetworks = [Network.mainnet, Network.hangzhounet];
-
 export class Address {
   connection: Tezos_Connection;
   contractAddress: string;
@@ -13,10 +11,15 @@ export class Address {
   static getAddress(network: Network): Address {
     let contractAddress: string;
     let connection: Tezos_Connection;
-    if (!SupportedNetworks.includes(network)) {
-      throw new Error(`network '${network}' is not supported`);
-    }
+
     switch (network) {
+      case Network.ithacanet: 
+        contractAddress = "KT1PnmpVWmA5CBUsA5ZAx1HoDW67mPYurAL5";
+        connection = <Tezos_Connection> {
+          provider: "https://rpc.ithaca.tzstats.com",
+          networkNameOrChainId: "ithacanet"  
+        }
+        break;
       case Network.hangzhounet: 
         contractAddress = "KT1Ni6JpXqGyZKXhJCPQJZ9x5x5bd7tXPNPC";
         connection = <Tezos_Connection> {
@@ -32,7 +35,7 @@ export class Address {
         };
         break;
       default:
-        throw new Error('unknown network');
+        throw new Error(`network ${network.toString()} is not supported`);
     }
     return new Address(connection, contractAddress);
   }
