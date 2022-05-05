@@ -18,4 +18,4 @@ Each project below is a different Polywrap wrapper (API) or plugin implementatio
 | [Tezos Domains Wrapper](./tezos/tezos-domains-wrapper)     | Complete | w3://ipfs/QmeYu6r6L9YPn3EhPzSqgyCEWPU4KvnwLCWTMPjvGYid7k    |
 | [Tezos Harbinger Wrapper](./tezos/harbinger-wrapper)       | Complete | w3://ipfs/QmPWL3GnEDCA32Ui6ufiZyXbyNeUbveewAsJ9z2BgEUFRu    |
 | [Tezos Hicetnunc Wrapper](./tezos/hicetnunc-wrapper)       | Complete | w3://ipfs/QmeA9mfy6HohweiFiZtxqySVCoi33fj9Lsd3yBRXwKA5xL    |
-| [Tezos QuipuSwap Wrapper](./tezos/quipuswap-wrapper)       | Complete | w3://ipfs/QmWTvdpdoWgHgQQvMQN5AvaSHBSe1ystxVGHLNFtNxdpnj    |
+| [Tezos QuipuSwap Wrapper](./tezos/quipuswap-wrapper)       | Complete | w3://ipfs/QmQsnEa1dB92uWDYB4grpC9YC4x9BsHscmWXPKUU4Uor8z    |
