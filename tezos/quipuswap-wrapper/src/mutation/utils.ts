@@ -29,7 +29,13 @@ export function swap(address: Address, owner: string, swapPairs: SwapPair[], swa
   let removeOperations: Tezos_TransferParams[] = [];
   for (let i = 0; i < swapPairs.length; i++) {
     const addAndRemoveOperations = getSwapAddAndRemoveOperations(address, owner, swapPairs[i], swapParams);
+    if (!addAndRemoveOperations.addOperation) {
+      throw new Error(`Add operation for pairId '${swapPairs[i].pairId}' could not be generated.`)
+    }
     addOperations.push(addAndRemoveOperations.addOperation);
+    if (!addAndRemoveOperations.removeOperation) {
+      throw new Error(`Remove operation for pairId '${swapPairs[i].pairId}' could not be generated.`)
+    }
     removeOperations.push(
       addAndRemoveOperations.removeOperation
     );
@@ -109,8 +115,8 @@ function getAddAndRemoveOperation(address: Address, token: JSON.Value, owner: st
     // note this shouldn't happen
     throw new Error("token should not be null");
   }
-  if (token.isString) {
-    const tokenFa12 = FA12.parse(token);
+  if (token.isObj && (<JSON.Obj>token).has("fa12")) {
+    const tokenFa12 = FA12.parse((<JSON.Obj>token).get("fa12")!);
     addOperation = tokenFa12.generateAddOperation(address.connection, address.contractAddress, amount);
     removeOperation = tokenFa12.generateRemoveOperation(address.connection, address.contractAddress);
   } else if (token.isObj && (<JSON.Obj>token).has("fa2")) {
@@ -119,7 +125,9 @@ function getAddAndRemoveOperation(address: Address, token: JSON.Value, owner: st
     removeOperation = tokenFa2.generateRemoveOperation(
       address.connection, owner, address.contractAddress
     );
-  };
+  } else {
+    throw new Error(`Token interface is not supported. Only FA2 and FA12 are supported. Token: '${token.stringify()}'`)
+  }
   return {
     addOperation,
     removeOperation
