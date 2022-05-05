@@ -20,6 +20,7 @@ export {
 export interface ConnectionConfig {
   provider: TezosProvider;
   signer?: InMemorySigner;
+  confirmationConfig?: ConfirmationConfig;
 }
 
 export interface ConnectionConfigs {
@@ -30,13 +31,17 @@ export interface Connections {
   [network: string]: Connection;
 }
 
+export interface ConfirmationConfig {
+  confirmationPollingTimeoutSecond: number | undefined
+  defaultConfirmationCount: number | undefined
+}
+
 export class Connection {
   private _client: TezosClient;
 
   constructor(private _config: ConnectionConfig) {
-    const { provider, signer } = _config;
-    // Sanitize Provider & Signer
-    this.setProvider(provider, signer !== undefined ? signer : undefined);
+    const { provider, signer, confirmationConfig } = _config;
+    this.setProvider(provider, signer, confirmationConfig);
   }
 
   static fromConfigs(configs: ConnectionConfigs): Connections {
@@ -67,9 +72,14 @@ export class Connection {
     });
   }
 
-  public setProvider(provider: TezosProvider, signer?: InMemorySigner): void {
+  public setProvider(provider: TezosProvider, signer?: InMemorySigner, confirmationConfig?: ConfirmationConfig): void {
     this._client = new TezosToolkit(provider);
     this._client.addExtension(new Tzip16Module());
+    if (confirmationConfig) {
+      this._client.setProvider({
+        config: confirmationConfig
+      })
+    }
     if (signer) {
       this.setSigner(signer);
     }

@@ -1,8 +1,6 @@
 import { Network, Tezos_Connection } from "../query/w3";
 import { SupportedActions, DefaultAddresses } from "./default-address"
 
-const SupportedNetworks = [Network.mainnet, Network.hangzhounet, Network.granadanet];
-
 export class Address {
   connection: Tezos_Connection;
   contractAddress: string;
@@ -18,10 +16,14 @@ export class Address {
     if (!SupportedActions.includes(action)) {
       throw new Error(`action '${action}' is not supported`);
     }
-    if (!SupportedNetworks.includes(network)) {
-      throw new Error(`network '${network}' is not supported`);
-    }
     switch (network) {
+      case Network.ithacanet:
+        contractAddress = DefaultAddresses.get(`Ithacanet.${action}`);
+        connection = <Tezos_Connection> {
+          provider: "https://rpc.ithaca.tzstats.com",
+          networkNameOrChainId: "ithacanet"
+        };
+        break;
       case Network.granadanet: 
         contractAddress = DefaultAddresses.get(`Granadanet.${action}`);
         connection = <Tezos_Connection> {
@@ -43,6 +45,8 @@ export class Address {
           networkNameOrChainId: "mainnet"
         };
         break;
+      default:
+        throw new Error(`Network '${network.toString()}' is not supported.`);
     }
     return new Address(connection, contractAddress);
   }

@@ -1,4 +1,4 @@
-declare module '@web3api/tezos-test-env' {
+declare module '@blockwatch-cc/tezos-test-env' {
     interface Node {
         url: string
         protocol: string

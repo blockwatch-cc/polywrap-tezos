@@ -1,6 +1,6 @@
 {
   "name": "@blockwatch-cc/tezos-test-env",
-  "version": "0.0.1-prealpha.62",
+  "version": "0.0.1-prealpha.63",
   "description": "Tezos Polywrapper Test Environment",
   "main": "index.js",
   "license": "MIT",

@@ -20,8 +20,8 @@ describe("e2e", () => {
     const api = await buildAndDeployApi(apiPath, ipfs, ensAddress);
     ensUri = `ens/testnet/${api.ensDomain}`;
     const tezosConnection = {
-      network: "hangzhounet",
-      provider: "https://rpc.hangzhou.tzstats.com",
+      network: "ithacanet",
+      provider: "https://rpc.ithaca.tzstats.com",
       signer: await InMemorySigner.fromSecretKey(Config.TZ_SECRET)
     }
     client = new Web3ApiClient({
@@ -205,6 +205,41 @@ describe("e2e", () => {
     })
 
     describe("swapDirect", () => {
+      it("should be to swap token directly on ithacanet", async () => {
+        const swapResponse = await client.query<{ swapDirect: QuerySchema.Tezos_TransferParams[] }>({
+          uri: ensUri,
+          query: `
+            mutation {
+              swapDirect(
+                network: ithacanet,
+                params: $params,
+                sendParams: $sendParams
+              )
+            }
+          `,
+          variables: {
+            params: {
+              pairId: 3,
+              direction: `b_to_a`,
+              swapParams: {
+                amountIn: "1",
+                minAmountOut: "3",
+                deadline: add(new Date(), { minutes: 10 }).toISOString(),
+                receiver:  "tz1PVZMqeRN4x2EAtHfn5qVcq6M9PB45kVMd"
+              }
+            },
+            sendParams: {
+              to: "",
+              amount: 0,
+              mutez: true
+            }
+          }
+        })
+        expect(swapResponse.errors).toBeUndefined()
+        expect(swapResponse.data?.swapDirect).toBeDefined()
+        expect(swapResponse.data?.swapDirect).toHaveLength(3)
+      });
+
       it("should swap tokens directly", async() => {
         const swapResponse = await client.query<{ swapDirect: QuerySchema.Tezos_TransferParams[] }>({
           uri: ensUri,

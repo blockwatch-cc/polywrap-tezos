@@ -1,7 +1,7 @@
 {
   "name": "@blockwatch-cc/tezos-plugin-js",
   "description": "Tezos Polywrap JS Plugin",
-  "version": "0.0.1-prealpha.62",
+  "version": "0.0.1-prealpha.63",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -21,17 +21,18 @@
     "test:watch": "jest --watch --passWithNoTests --verbose"
   },
   "dependencies": {
-    "@taquito/signer": "12.0.0",
-    "@taquito/tzip16": "12.0.0",
-    "@taquito/taquito": "12.0.0",
-    "@taquito/michel-codec": "12.0.0",
-    "@taquito/michelson-encoder": "12.0.0",
-    "@taquito/utils": "12.0.0",
+    "@taquito/signer": "12.1.0",
+    "@taquito/tzip16": "12.1.0",
+    "@taquito/taquito": "12.1.0",
+    "@taquito/michel-codec": "12.1.0",
+    "@taquito/michelson-encoder": "12.1.0",
+    "@taquito/utils": "12.1.0",
     "@web3api/core-js": "0.0.1-prealpha.61",
     "@temple-wallet/dapp": "6.1.0",
     "axios": "0.25.0"
   },
   "devDependencies": {
+    "@blockwatch-cc/tezos-test-env": "0.0.1-prealpha.63",
     "@types/jest": "26.0.8",
     "@web3api/client-js": "0.0.1-prealpha.61",
     "@web3api/ens-plugin-js": "0.0.1-prealpha.61",

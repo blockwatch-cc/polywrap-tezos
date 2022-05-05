@@ -64,7 +64,7 @@ steps:
 - name: npm publish
   image: plugins/npm
   settings:
-    username: 3sky
+    username: blockwatch
     token:
       from_secret: npm_token
     email: devops@blockwatch.cc
@@ -92,7 +92,7 @@ steps:
 - name: npm publish
   image: plugins/npm
   settings:
-    username: 3sky
+    username: blockwatch
     token:
       from_secret: npm_token
     email: devops@blockwatch.cc
@@ -121,7 +121,7 @@ steps:
 - name: npm publish
   image: plugins/npm
   settings:
-    username: 3sky
+    username: blockwatch
     token:
       from_secret: npm_token
     email: devops@blockwatch.cc

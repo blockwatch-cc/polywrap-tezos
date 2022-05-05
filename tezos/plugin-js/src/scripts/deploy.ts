@@ -36,10 +36,16 @@ export const SIMPLE_CONTRACT = `
 export const SIMPLE_CONTRACT_STORAGE = 0
 
 export async function deployContract(url: string, privateKey: string, deployParams: any): Promise<string | undefined> {
-    const Tezos = new TezosToolkit(url)
-    const signer = await InMemorySigner.fromSecretKey(privateKey)
-    Tezos.setSignerProvider(signer)
-    const originationOperation = await Tezos.contract.originate(deployParams)
-    const contract = await originationOperation.contract()
-    return contract.address
+  const Tezos = new TezosToolkit(url)
+  Tezos.setProvider({
+    config: {
+      defaultConfirmationCount: 2,
+      confirmationPollingTimeoutSecond: 10
+    }
+  })
+  const signer = await InMemorySigner.fromSecretKey(privateKey)
+  Tezos.setSignerProvider(signer)
+  const originationOperation = await Tezos.contract.originate(deployParams)
+  const contract = await originationOperation.contract(2)
+  return contract.address
 }

@@ -24,7 +24,8 @@ export class TezosDomainPlugin extends Plugin {
   public static defaultNetwork: Types.NetworkString = "mainnet"; 
   private connections: Record<Types.NetworkString, string> = {
     mainnet: 'https://rpc.tzstats.com',
-    hangzhounet: 'https://rpc.hangzhou.tzstats.com'
+    hangzhounet: 'https://rpc.hangzhou.tzstats.com',
+    ithacanet: 'https://rpc.ithaca.tzstats.com',
   }
   
   constructor(cfg: TezosDomainPluginConfig) {

@@ -41,7 +41,6 @@ describe("Tezos Domains Plugin", () => {
 
         expect(response.errors).toBeUndefined()
         expect(response.data?.getAcquisitionInfo.state).toBe("Taken")
-        expect(response.data?.getAcquisitionInfo.cost).toBeDefined()
       })
 
       it("returns the acquisition state of the domain name", async () => {
@@ -81,24 +80,24 @@ describe("Tezos Domains Plugin", () => {
         expect(response.data?.bytesToHex).toBe("7b90cd2abd2ca06e4349e63e1913f7f25351cc1ac432cafc24033941fbfb88f40c91386b2449e33aac7a3b99e9be37da70270138cb06db702a92243874324913")
       })
     })
-  })
 
-  describe("char2Bytes", () => {
-    it("encodes characters to bytes", async () => {
-      const response  = await client.query<{ char2Bytes: string }>({
-        uri,
-        query: `
-          query {
-            char2Bytes(
-              text: "commit"
-            )
-          }
-        `
+    describe("char2Bytes", () => {
+      it("encodes characters to bytes", async () => {
+        const response  = await client.query<{ char2Bytes: string }>({
+          uri,
+          query: `
+            query {
+              char2Bytes(
+                text: "commit"
+              )
+            }
+          `
+        })
+    
+        expect(response.errors).toBeUndefined()
+        expect(response.data?.char2Bytes).toBeDefined()
+        expect(response.data?.char2Bytes).toBe("636f6d6d6974")
       })
-  
-      expect(response.errors).toBeUndefined()
-      expect(response.data?.char2Bytes).toBeDefined()
-      expect(response.data?.char2Bytes).toBe("636f6d6d6974")
     })
   })
 });

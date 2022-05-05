@@ -15,7 +15,7 @@ Each project below is a different Polywrap wrapper (API) or plugin implementatio
 | [Near JS Plugin (limited)](./near/plugin-js) | Complete | Not deployed. See the [full Near wrapper specification](near/Near%20Polywrapper%20Specification.md) |
 | [Tezos Core Plugin](./tezos/plugin-js)     		   | Complete | NPM: [tezos-plugin-js](https://www.npmjs.com/package/@blockwatch-cc/tezos-plugin-js)    |
 | [Tezos Domains JS Plugin](./tezos/tezos-domains-plugin-js)     | Complete | NPM: [tezos-domains-plugin-js](https://www.npmjs.com/package/@blockwatch-cc/tezos-domains-plugin-js)    |
-| [Tezos Domains Wrapper](./tezos/tezos-domains-wrapper)     | Complete | w3://ipfs/QmdqbBSP8YgmSTDvBM6iRPF1C6EyQbB7wDoqssBeiivrig    |
+| [Tezos Domains Wrapper](./tezos/tezos-domains-wrapper)     | Complete | w3://ipfs/QmeYu6r6L9YPn3EhPzSqgyCEWPU4KvnwLCWTMPjvGYid7k    |
 | [Tezos Harbinger Wrapper](./tezos/harbinger-wrapper)       | Complete | w3://ipfs/QmPWL3GnEDCA32Ui6ufiZyXbyNeUbveewAsJ9z2BgEUFRu    |
 | [Tezos Hicetnunc Wrapper](./tezos/hicetnunc-wrapper)       | Complete | w3://ipfs/QmeA9mfy6HohweiFiZtxqySVCoi33fj9Lsd3yBRXwKA5xL    |
-| [Tezos QuipuSwap Wrapper](./tezos/quipuswap-wrapper)       | Complete | w3://ipfs/QmXN9MN9AT5dU8kkqgQQ9tyanqBsScHjix1CwQmGAGFCup    |
+| [Tezos QuipuSwap Wrapper](./tezos/quipuswap-wrapper)       | Complete | w3://ipfs/QmQsnEa1dB92uWDYB4grpC9YC4x9BsHscmWXPKUU4Uor8z    |
