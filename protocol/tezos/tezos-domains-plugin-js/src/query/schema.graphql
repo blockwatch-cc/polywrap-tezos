@@ -1,8 +1,7 @@
 """ Suppported Network """
 enum Network {
   mainnet
-  hangzhounet
-  ithacanet
+  ghostnet
 }
 
 """ State of domain acquisition """
