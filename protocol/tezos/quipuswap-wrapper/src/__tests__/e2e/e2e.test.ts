@@ -37,15 +37,11 @@ describe("e2e", () => {
                     mainnet: {
                         provider: "https://rpc.tzstats.com"
                     },
-                    hangzhounet: {
-                        provider: "https://rpc.tzkt.io/hangzhou2net",
-                        signer
-                    },
-                    ithacanet: {
-                        provider: "https://rpc.ithaca.tzstats.com"
+                    ghostnet: {
+                        provider: "https://rpc.ghost.tzstats.com"
                     }
                 },
-                defaultNetwork: "hangzhounet"
+                defaultNetwork: "ghostnet"
               })
           },
           ...getPlugins(testEnv.ipfs, testEnv.ensAddress, testEnv.ethereum)
@@ -65,7 +61,7 @@ describe("e2e", () => {
           query: `
             query {
               getTokenPair(
-                network: hangzhounet,
+                network: ghostnet,
                 pairId: "4"
               )
             }
@@ -83,7 +79,7 @@ describe("e2e", () => {
           query: `
             query {
               getTokenPair(
-                network: hangzhounet,
+                network: ghostnet,
                 pairId: "1000"
               )
             }
@@ -173,7 +169,7 @@ describe("e2e", () => {
           query: `
             mutation {
               addOperator(
-                network: hangzhounet,
+                network: ghostnet,
                 contractAddress: $contractAddress
                 params: $params
               )
@@ -202,7 +198,7 @@ describe("e2e", () => {
           query: `
             mutation {
               removeOperator(
-                network: hangzhounet,
+                network: ghostnet,
                 contractAddress: $contractAddress
                 params: $params
               )
@@ -229,13 +225,13 @@ describe("e2e", () => {
     })
 
     describe("swapDirect", () => {
-      it("should be to swap token directly on hangzhounet", async () => {
+      it("should be to swap token directly on ghostnet", async () => {
         const swapResponse = await client.query<{ swapDirect: QuerySchema.Tezos_TransferParams[] }>({
           uri: ensUri,
           query: `
             mutation {
               swapDirect(
-                network: hangzhounet,
+                network: ghostnet,
                 params: $params,
                 sendParams: $sendParams
               )
@@ -270,7 +266,7 @@ describe("e2e", () => {
           query: `
             mutation {
               swapDirect(
-                network: hangzhounet,
+                network: ghostnet,
                 params: $params,
                 sendParams: $sendParams
               )
@@ -325,7 +321,7 @@ describe("e2e", () => {
           query: `
             mutation {
               transfer(
-                network: hangzhounet,
+                network: ghostnet,
                 params: $params,
                 sendParams: $sendParams
               )
@@ -375,7 +371,7 @@ describe("e2e", () => {
           query: `
             mutation {
               transferFrom(
-                network: hangzhounet,
+                network: ghostnet,
                 from: $from,
                 params: $params,
                 sendParams: $sendParams
@@ -411,7 +407,7 @@ describe("e2e", () => {
           query: `
             mutation {
               invest(
-                network: hangzhounet,
+                network: ghostnet,
                 params: $params,
                 sendParams: $sendParams
               )
@@ -462,7 +458,7 @@ describe("e2e", () => {
           query: `
             mutation {
               divest(
-                network: hangzhounet,
+                network: ghostnet,
                 params: $params,
                 sendParams: $sendParams
               )
