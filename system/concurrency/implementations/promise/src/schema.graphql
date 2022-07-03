@@ -1,0 +1,3 @@
+#import { Module } into Interface from "ens/interface.concurrent.polywrap.eth"
+
+type Module implements Interface_Module {}

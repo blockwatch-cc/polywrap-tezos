@@ -1,0 +1,37 @@
+enum TaskStatus {
+  PENDING  # applicable when running in pool
+  RUNNING
+  COMPLETED
+  CANCELLED  # applicable when threads/processes are used
+  FAILED
+}
+
+enum ReturnWhen {
+  FIRST_COMPLETED,  # return the first task that completes or fails
+  ANY_COMPLETED,  # return any task that completes or returns array of all the errors
+  ALL_COMPLETED,  # return result of all the tasks or failures
+}
+
+type Task {
+  uri: String!
+  method: String!
+  args: Bytes!
+}
+
+type TaskResult {
+  taskId: Int!
+  result: Bytes
+  error: String
+  status: TaskStatus!
+}
+
+type Env {
+  max_workers: Int
+}
+
+type Module {
+  result(taskIds: [Int!]!, returnWhen: ReturnWhen!): [TaskResult!]!
+  status(taskIds: [Int!]!): [TaskStatus!]!
+  schedule(tasks: [Task!]!): [Int!]! # returns taskIds
+  # cancel(taskIds: [String!]!): [Boolean!]! # not implemented
+}

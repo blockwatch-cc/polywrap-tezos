@@ -1,0 +1,17 @@
+format: 0.0.1-prealpha.3
+displayName: Concurrent Promise Demo
+subtext: demo wrapper using concurrent-promise
+description: demo wrapper using concurrent-promise
+tags:
+  - concurrency
+repository: https://github.com/test/test
+icon: ./meta/icon.png
+links:
+  - name: test link
+    icon: ./meta/link.svg
+    url: http://link.com/path
+queries:
+  - name: test query
+    description: test description
+    query: ./meta/test.graphql
+    vars: ./meta/test.json

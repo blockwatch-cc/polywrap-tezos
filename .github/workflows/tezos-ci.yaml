@@ -1,6 +1,9 @@
 name: CI
 
-on: [pull_request]
+on:
+  pull_request:
+    paths:
+      - 'protocol/tezos/**'
 
 jobs:
   CI:
@@ -14,7 +17,7 @@ jobs:
       - name: Read .nvmrc
         run: echo ::set-output name=NVMRC::$(cat .nvmrc)
         id: tezos-nvm
-        working-directory: ./tezos/tezos-domains-wrapper
+        working-directory: ./protocol/tezos/tezos-domains-wrapper
 
       - name: Setup Node.js
         uses: actions/setup-node@master
@@ -23,11 +26,11 @@ jobs:
 
       - name: (Tezos) Install dependencies
         run: yarn install --nonInteractive --frozen-lockfile --prefer-offline
-        working-directory: ./tezos/test-env
+        working-directory: ./protocol/tezos/test-env
 
       - name: Test up
         run: npm run test:env:up
-        working-directory: ./tezos/test-env
+        working-directory: ./protocol/tezos/test-env
         env:
           TEZOS_POLYWRAP_PORT: 20000
           TEZOS_POLYWRAP_BLOCK_TIME: 5
@@ -37,7 +40,7 @@ jobs:
 
       - name: Test down
         run: npm run test:env:down
-        working-directory: ./tezos/test-env
+        working-directory: ./protocol/tezos/test-env
         env:
           TEZOS_POLYWRAP_PORT: 20000
           TEZOS_POLYWRAP_BLOCK_TIME: 5

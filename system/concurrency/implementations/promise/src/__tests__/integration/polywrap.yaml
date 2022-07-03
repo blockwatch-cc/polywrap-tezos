@@ -1,0 +1,10 @@
+format: 0.0.1-prealpha.9
+name: concurrency-demo
+language: wasm/assemblyscript
+deploy: ./polywrap.deploy.yaml
+build: ./polywrap.build.yaml
+module: ./src/index.ts
+schema: ./src/schema.graphql
+import_redirects:
+  - uri: "ens/interface.concurrent.polywrap.eth"
+    schema: ../../../../../interface/build/schema.graphql

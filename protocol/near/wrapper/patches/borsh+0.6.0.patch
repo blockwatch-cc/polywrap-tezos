@@ -1,0 +1,30 @@
+diff --git a/node_modules/borsh/lib/index.js b/node_modules/borsh/lib/index.js
+index f0f541a..3fa6868 100644
+--- a/node_modules/borsh/lib/index.js
++++ b/node_modules/borsh/lib/index.js
+@@ -303,7 +303,24 @@ function serializeStruct(schema, obj, writer) {
+         obj.borshSerialize(writer);
+         return;
+     }
+-    const structSchema = schema.get(obj.constructor);
++    let structSchema = schema.get(obj.constructor);
++    if (!structSchema && obj.constructor.name === 'PublicKey') {
++        const key = Array.from(schema.keys())[3];
++        structSchema = schema.get(key);
++    }
++     if (!structSchema && obj.constructor.name === 'AccessKeyPermission') {
++        const key = Array.from(schema.keys())[5];
++        // 6 FunctionCallPermission, 7 FullAccessPermission
++        structSchema = schema.get(key);
++    }
++     if (!structSchema && obj.constructor.name === 'FunctionCallPermission') {
++        const key = Array.from(schema.keys())[6];
++        structSchema = schema.get(key);
++    }
++     if (!structSchema && obj.constructor.name === 'FullAccessPermission') {
++        const key = Array.from(schema.keys())[7];
++        structSchema = schema.get(key);
++    }
+     if (!structSchema) {
+         throw new BorshError(`Class ${obj.constructor.name} is missing in schema`);
+     }

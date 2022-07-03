@@ -1,0 +1,8 @@
+format: 0.0.1-prealpha.3
+name: in-memory-cache
+language: plugin/typescript
+schema: ./src/schema.graphql
+module: ./src/index.ts
+import_redirects:
+  - uri: "ens/interface.cache.polywrap.eth"
+    schema: ../../interface/build/schema.graphql

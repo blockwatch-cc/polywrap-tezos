@@ -1,0 +1,227 @@
+#import * from "../common/schema.graphql"
+
+""" Describes a tezos account """
+type AccountDetails {
+  """ Public key hash of account """
+  pkh: String!
+  """ Balance of account """
+  balance: String!
+}
+
+""" Describes a block """
+type Block {
+  """ Chain hash"""
+  chainId: String!
+  """ Block hash """
+  hash: String!
+  """ Protocol hash """
+  protocol: String!
+}
+
+""" Describes a transfer transaction confirmation """
+type TransferConfirmation {
+  """ Flag indicating operation is completed """
+  completed: Boolean!
+  """ Total number of current confirmations """
+  currentConfirmation: UInt32!
+  """ Total expected confirmation """
+  expectedConfirmation: UInt32!
+  """ Block for confirmation"""
+  block: Block!
+}
+
+""" Describes origination response """
+type OriginationResponse {
+  """ Flag indicating an error occurred """
+  error: Boolean!
+  """ Reason for the error """
+  reason: String
+  """ Origination operation response """
+  origination: OriginationOperation
+}
+
+""" Describes Transaction operation """
+type TxOperation {
+  """ Transaction hash """
+  hash: String!
+  """ Source of transaction """
+  source: String
+  """ Balance of transaction """
+  amount: BigInt
+  """ Gas consumed """
+  consumedGas: BigInt
+  """ Transaction destination """
+  destination: String!
+  """ Error transaction """
+  errors: [OperationError!]
+  """ Fee paid in tez """
+  fee: UInt32!
+  """ Called-Defined gas limit """
+  gasLimit: UInt32!
+  """ Block number transaction is included """
+  includedInBlock: String!
+  """ Status of transaction  """
+  status: String!
+  """ Difference of storage """
+  storageDiff: String
+  """ Called-Defined storage limit  """
+  storageLimit: UInt32!
+  """ Storage size """
+  storageSize: BigInt
+}
+
+""" Describes a signed message """
+type SignResult {
+  """ Input Bytes"""
+  bytes: String!
+  """ 'sig' prefixed signature """
+  sig: String!
+  """ 'edsig' prefixed signature """
+  prefixSig: String!
+  """ raw bytes of the signature """
+  sbytes: String!
+}
+
+""" Describes origination with confirmation """
+type OriginationConfirmationResponse {
+  """ Total confirmation """
+  confirmation: UInt32!
+  """ Origination operation """
+  origination: OriginationOperation!
+}
+
+""" Response to call contract and await confirmation """
+type CallContractMethodConfirmationResponse {
+  """ Confirmation """
+  confirmation: UInt32!
+  """ Transaction operation response """
+  operation: TxOperation!
+}
+
+type Mutation {
+  """ Make a batch contract call """
+  batchContractCalls(
+    """ Transfer Params """
+    params: [TransferParams!]!
+    """ Connection """
+    connection: Connection
+  ): String!
+
+  """ Make a batch wallet call """
+  batchWalletContractCalls(
+    """ Transfer Params """
+    params: [TransferParams!]!
+    """ Connection """
+    connection:Connection
+  ): String!
+
+  """ Connect temple wallet """
+  connectTempleWallet(
+    """ App name """
+    appName: String!
+    """ Network to connection """
+    network: String!
+    """ Connection """
+    connection: Connection
+  ): AccountDetails!
+
+  """ Wallet contract call method """
+  walletContractCallMethod(
+    """ Address of contract """
+    address: String!
+    """ Method to call """
+    method: String!
+    """ Arguments """
+    args: String
+    """ SendParams """
+    params: SendParams
+    """ Connection """
+    connection: Connection
+  ): String!
+
+  """ Wallet originate """
+  walletOriginate(
+    """ Originate params """
+    params: OriginateParams!
+    """ Connection """
+    connection: Connection
+  ): String!
+
+  """ Call contract method """
+  callContractMethod(
+    """ Address of contract """
+    address: String!
+    """ Method to call """
+    method: String!
+    """ Arguments """
+    args: String
+    """ SendParams """
+    params: SendParams
+    """ Connection """
+    connection: Connection
+  ): TxOperation!
+
+  """ Call contract and wait for confirmation """
+  callContractMethodAndConfirmation(
+    """ Address of a contract """
+    address: String!
+    """ Method to contract """
+    method: String!
+    """ Arguments """
+    args: String
+    """ Connection """
+    connection: Connection
+    """ SendParams """
+    params: SendParams
+    """ Confirmations to wait for """
+    confirmations: UInt32!
+    """ Timeout to wait for confirmation """
+    timeout: UInt32
+  ): CallContractMethodConfirmationResponse!
+
+  """ Transfer tez """
+  transfer(
+    """ Connection """
+    connection: Connection
+    """ Sendparams """
+    params: SendParams!
+  ): String!
+
+  """ Transfer tez and wait for confirmation """
+  transferAndConfirm(
+    """ Connection """
+    connection: Connection
+    """ SendParams """
+    params: SendParams!
+    """ Confirmations to wait for """
+    confirmations: UInt32!
+  ): TransferConfirmation!
+
+  """ Sign message """
+  signMessage(
+    """ Connection """
+    connection: Connection
+    """ Message to sign """
+    message: String!
+  ): SignResult!
+
+  """ Originate a contract """
+  originate(
+    """ Connection """
+    connection: Connection
+    """ OriginateParams """
+    params: OriginateParams!
+  ): OriginationResponse!
+
+  """" Originate and wait for confirmation """
+  originateAndConfirm(
+    """ Connection """
+    connection: Connection
+    """ OriginateParams """
+    params: OriginateParams!
+    """ Confirmations to wait for """
+    confirmations: UInt32!
+    """ Timeout to wait for confirmation """
+    timeout: UInt32
+  ): OriginationConfirmationResponse!
+}

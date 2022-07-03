@@ -1,8 +1,0 @@
-format: 0.0.1-prealpha.1
-docker:
-  name: tezos-domains-wrapper-build
-config:
-  node_version: "14.17.0"
-  include:
-    - ./package.json
-    - ./src

@@ -1,6 +1,9 @@
 name: CI
 
-on: [pull_request]
+on:
+  pull_request:
+    paths:
+      - 'protocol/ethereum/uniswapv2/**'
 
 jobs:
   CI:
@@ -14,7 +17,7 @@ jobs:
       - name: Read .nvmrc
         run: echo ::set-output name=NVMRC::$(cat .nvmrc)
         id: uniswapv2-nvm
-        working-directory: ./uniswapv2/wrapper
+        working-directory: ./protocol/ethereum/uniswapv2/wrapper
 
       - name: Setup Node.js
         uses: actions/setup-node@master
@@ -23,12 +26,12 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --nonInteractive --frozen-lockfile --prefer-offline
-        working-directory: ./uniswapv2/wrapper
+        working-directory: ./protocol/ethereum/uniswapv2/wrapper
 
       - name: Build
         run: yarn build
-        working-directory: ./uniswapv2/wrapper
+        working-directory: ./protocol/ethereum/uniswapv2/wrapper
 
       - name: Test
         run: yarn test
-        working-directory: ./uniswapv2/wrapper
+        working-directory: ./protocol/ethereum/uniswapv2/wrapper

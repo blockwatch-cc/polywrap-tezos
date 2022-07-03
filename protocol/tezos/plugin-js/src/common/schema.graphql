@@ -1,0 +1,127 @@
+""" Describes operation error """
+type OperationError {
+  """ Operation type """
+  kind: String!
+  """ Id of operation """
+  id: String!
+}
+
+""" Describes send parameters """
+type SendParams {
+  """ Tezos account to send """
+  to: String!
+  """ Amount to send """
+  amount: UInt32!
+  """ Tezos account making transfer """
+  source: String
+  """ Called-defined fee limit to be paid """
+  fee: UInt32
+  """ Caller-defined gas limit """
+  gasLimit: UInt32
+  """ Caller-defined storage limit """
+  storageLimit: UInt32
+  """ Flag indicating Amount is express in micro tez """
+  mutez: Boolean
+}
+
+""" Describes transfer params of a transaction operation """
+type TransferParams {
+  """ Tezos account to send """
+  to: String!
+  """ Amount to send """
+  amount: UInt32!
+  """ Called-defined fee limit to be paid"""
+  fee: UInt32
+  source: String
+  """ Flag indicating Amount is express in micro tez"""
+  mutez: Boolean
+  """
+  Michelson expression expressed in a string
+  TODO(): switch to JSON when nested object and maps are supported
+  """
+  parameter: String
+  """ Caller-defined gas limit """
+  gasLimit: UInt32
+  """ Flag indicating Amount is express in micro tez"""
+  storageLimit: UInt32
+}
+
+""" Describes originate parameters """
+type OriginateParams {
+  """ Contract code """
+  code: String!
+  """ Initial storage """
+  storage: String!
+  """ Initial balance  """
+  balance: String
+  """ """
+  delegate: String
+  """ Called-defined fee limit to be paid"""
+  fee: UInt32
+  """ Caller-defined gas limit """
+  gasLimit: UInt32
+  """ Flag indicating Amount is express in micro tez"""
+  storageLimit: UInt32
+  """ Flag indicating Amount is express in micro tez"""
+  mutez: Boolean
+  """ Initial storage """
+  init: String
+}
+
+""" Describes estimate """
+type Estimate {
+  """ Burn fee paid in mutez"""
+  burnFeeMutez: UInt32!
+  """ Caller-defined gas limit """
+  gasLimit: UInt32!
+  """ Minimal fee paid in mutez """
+  minimalFeeMutez: UInt32!
+  """ Operation size """
+  opSize: String!
+  """ Caller-defined storage limit """
+  storageLimit: UInt32!
+  """ Suggested fee paid in mutez """
+  suggestedFeeMutez: UInt32!
+  """ Total cost transaction """
+  totalCost: UInt32!
+  """ Using base fee paid in mutez """
+  usingBaseFeeMutez: UInt32!
+  """ Gas consumed """
+  consumedMilligas: UInt32!
+}
+
+""" Describes origination transaction """
+type OriginationOperation {
+  """ Originated contract address """
+  contractAddress: String
+  """ Contract hash """
+  hash: String!
+  """ Gas consumed """
+  consumedGas: String
+  """ Transaction errors """
+  errors: [OperationError!]
+  """ Fee paid in tez """
+  fee: UInt32!
+  """ Caller-defined gas limit """
+  gasLimit: UInt32!
+  """ Block number origination transaction was included """
+  includedInBlock: UInt32!
+  """ Revealed Status of contract """
+  revealStatus: String
+  """ Status of contract """
+  status: String
+  """ Difference in storage after origination """
+  storageDiff: String
+  """ Called-Defined Storage limit """
+  storageLimit: UInt32!
+  """ Storage size used """
+  storageSize: String
+}
+
+""" Describes connection """
+type Connection {
+  """ RPC Node url """
+  provider: String
+  """ Network name """
+  networkNameOrChainId: String
+}

@@ -1,0 +1,35 @@
+type Module {
+  """
+  Look up key in the cache and return the value for it if exists otherwise returns null
+  """
+  get(key: String!): String
+
+
+  """
+  Checks if a key exists in the cache without returning it.
+  """
+  has(key: String!): Boolean!
+
+  """
+  Add a new key/value to the cache (overwrites value, if key already exists in the cache).
+  """
+  set(key: String!, value: String!, timeout: Int): Boolean! 
+
+  """
+  Works like set() but does not overwrite the values of already existing keys.
+  """
+  add(key: String!, value: String!, timeout: Int): Boolean! 
+
+  """
+  Delete key from the cache. Returns true if key exists in cache and has been deleted successfully
+  """
+  delete(key: String!): Boolean!
+
+  """
+  Clears the whole cache. 
+  """
+  clear: Boolean!
+
+  # retrieve all the keys in the cache
+  # different extensions for the different cache implementations
+}

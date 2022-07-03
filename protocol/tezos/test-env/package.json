@@ -1,0 +1,22 @@
+{
+  "name": "@blockwatch-cc/tezos-test-env",
+  "version": "0.0.1-prealpha.80",
+  "description": "Tezos Polywrapper Test Environment",
+  "main": "index.js",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/blockwatch-cc/polywrap-tezos"
+  },
+  "scripts": {
+    "test:env:up": "node script.js up",
+    "test:env:down": "node script.js down",
+    "test:env:accounts": "node script.js accounts"
+  },
+  "dependencies": {
+    "dotenv": "10.0.0",
+    "@taquito/taquito": "12.1.0",
+    "@taquito/signer": "12.1.0",
+    "chalk": "4.1.0"
+  }
+}

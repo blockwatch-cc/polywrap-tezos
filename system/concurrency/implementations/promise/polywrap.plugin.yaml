@@ -1,0 +1,8 @@
+name: concurrentPromise
+format: 0.0.1-prealpha.3
+language: plugin/typescript
+module: ./src/index.ts
+schema: ./src/schema.graphql
+import_redirects:
+  - uri: "ens/interface.concurrent.polywrap.eth"
+    schema: ../../interface/build/schema.graphql

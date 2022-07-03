@@ -24,7 +24,7 @@ steps:
       path: /var/run/docker.sock
   commands:
     - apk add yarn npm
-    - cd tezos/test-env
+    - cd protocol/tezos/test-env
     - yarn
     - npm run test:env:up
     - npm run test:env:down
@@ -57,7 +57,7 @@ steps:
 - name: yarn build
   image: node:lts-alpine3.14
   commands:
-    - cd tezos/plugin-js
+    - cd protocol/tezos/plugin-js
     - yarn install
     - yarn build
 
@@ -86,7 +86,7 @@ steps:
 - name: yarn build
   image: node:lts-alpine3.14
   commands:
-    - cd tezos/test-env
+    - cd protocol/tezos/test-env
     - yarn install
 
 - name: npm publish
@@ -114,7 +114,7 @@ steps:
 - name: yarn build
   image: node:lts-alpine3.14
   commands:
-    - cd tezos/tezos-domains-plugin-js
+    - cd protocol/tezos/tezos-domains-plugin-js
     - yarn install
     - yarn build
 

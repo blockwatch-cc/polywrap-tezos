@@ -1,0 +1,15 @@
+format: 0.0.1-prealpha.1
+stages:
+  ipfs_deploy:
+    package: ipfs
+    uri: fs/./build
+    config:
+      gatewayUri: https://ipfs.wrappers.io
+  ens_deploy:
+    package: ens
+    depends_on: ipfs_deploy
+    config:
+      domainName: quipuswap.eth
+      provider: 'https://rinkeby.infura.io/v3/d119148113c047ca90f0311ed729c466'
+      ensRegistryAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e'
+      privateKey: ''

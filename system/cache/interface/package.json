@@ -1,0 +1,13 @@
+{
+  "name": "cache-interface",
+  "description": "Polywrap Caching interface",
+  "private": true,
+  "version": "0.0.1-prealpha.86",
+  "scripts": {
+    "build": "npx polywrap build",
+    "deploy": "npx polywrap deploy"
+  },
+  "devDependencies": {
+    "polywrap": "0.0.1-prealpha.86"
+  }
+}

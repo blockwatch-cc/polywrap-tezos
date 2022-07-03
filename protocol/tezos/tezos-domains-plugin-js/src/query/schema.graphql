@@ -1,0 +1,48 @@
+""" Suppported Network """
+enum Network {
+  mainnet
+  hangzhounet
+  ithacanet
+}
+
+""" State of domain acquisition """
+enum AcquisitionState {
+  Unobtainable
+  Taken
+  CanBeBought
+  CanBeAuctioned
+  AuctionInProgress
+  CanBeSettled
+}
+
+""" Domain acquisition information """
+type AcquisitionInfo {
+  """ Cost to acquire domain """
+  cost: UInt32
+  """ Duration of domain acquisition """
+  duration: UInt32
+  """ AcquisitionState """
+  state: AcquisitionState!
+}
+
+type Query {
+  """ Get Acquisition information """
+  getAcquisitionInfo(
+    """ Network """
+    network: Network
+    """ Domain name to enquire """
+    domain: String!
+    """ Duration to enquire """
+    duration: UInt32
+  ): AcquisitionInfo
+
+  """ Convert bytes to hex """
+  bytesToHex(
+    bytes: String!
+  ): String!
+
+  """ Convert characters to hex """
+  char2Bytes(
+    text: String!
+  ): String!
+}

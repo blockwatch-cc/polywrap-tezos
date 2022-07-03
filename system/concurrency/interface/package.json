@@ -1,0 +1,15 @@
+{
+  "name": "@polywrap/concurrent-interface",
+  "description": "Concurrent interface",
+  "private": true,
+  "version": "0.0.1-prealpha.91",
+  "scripts": {
+    "build": "npx polywrap build",
+    "test:env:up": "npx w3 test-env up",
+    "test:env:down": "npx w3 test-env down",
+    "deploy": "npx polywrap deploy"
+  },
+  "devDependencies": {
+    "polywrap": "0.0.1-prealpha.91"
+  }
+}

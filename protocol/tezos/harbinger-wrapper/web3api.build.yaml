@@ -1,0 +1,9 @@
+format: 0.0.1-prealpha.2
+docker:
+  name: harbinger-wrapper-build
+config:
+  node_version: "14.17.0"
+  include:
+    - ./package.json
+    - ./src/query
+    - ./src/utils

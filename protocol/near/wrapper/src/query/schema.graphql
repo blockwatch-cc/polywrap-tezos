@@ -1,0 +1,447 @@
+#import { Query, Transaction, Action, PublicKey, KeyType, ExecutionOutcome, ExecutionProof, FinalExecutionOutcome, FinalExecutionOutcomeWithReceipts } into Near from "w3://ens/nearPlugin.web3api.eth"
+
+type Query {
+  requestSignIn(
+    contractId: String
+    methodNames: [String!]
+    successUrl: String
+    failureUrl: String
+  ): Boolean!
+
+  signOut: Boolean!
+
+  isSignedIn: Boolean!
+
+  getAccountId: String
+
+  """
+    RPC Query Functions not part of JsonRpcProvider (Implemented, Tested)
+  """
+  getAccountState(
+    accountId: String!
+  ): AccountView!
+
+  viewContractCode(
+    accountId: String!
+   ) : ViewContractCode!
+
+  findAccessKey(
+    accountId: String!
+  ): AccessKeyInfo
+
+  getPublicKey(
+    accountId: String!
+  ): Near_PublicKey
+
+  """
+    RPC Query Functions not part of JsonRpcProvider (Implemented, Tested)
+  """
+
+  getAccountBalance(
+    accountId: String!
+  ): AccountBalance!
+
+  getAccountDetails(
+    accountId: String!
+  ): [AccountAuthorizedApp!]!
+
+  getAccessKeys(
+    accountId: String!
+  ): [AccessKeyInfo!]!
+
+  viewFunction(
+    contractId: String!
+    methodName: String!
+    args: JSON!
+  ): JSON!
+
+  viewContractState(
+    prefix: String!
+    blockQuery: BlockReference!
+    accountId: String!
+  ): ContractStateResult!
+
+  """
+    Transaction Query Functions (Implemented, Tested)
+  """
+
+  # creates a transaction. If signerId is not provided, creates transaction with wallet.
+  createTransaction(
+    receiverId: String!
+    actions: [Near_Action!]!
+    signerId: String
+  ): Near_Transaction!
+
+  # signs a transaction without wallet
+  signTransaction(
+    transaction: Near_Transaction!
+  ): Near_SignTransactionResult!
+
+  """
+    Utility Functions
+  """
+
+  parseNearAmount(
+    amount: String!
+  ): String!
+
+  formatNearAmount(
+    amount: String!
+  ): String!
+
+  """
+    JsonRpcProvider Query Functions (Implemented, Tested)
+  """
+  getBlock(
+    blockQuery: BlockReference!
+  ): BlockResult!
+
+  """
+    JsonRpcProvider Query Functions (Implemented, Tested)
+  """
+  status: NodeStatusResult!
+
+  txStatus(
+    txHash: String! #(Bytes | String)! 
+    accountId: String!
+  ): Near_FinalExecutionOutcome!
+
+  txStatusReceipts(
+    txHash: String! #Bytes!
+    accountId: String!
+  ): Near_FinalExecutionOutcomeWithReceipts!
+
+  blockChanges(
+    blockQuery: BlockReference!
+  ): BlockChangeResult!
+
+  chunk(
+    chunkId: String!  #  (String | [BigInt!])! chunk hash or [blockId, chunkId]
+  ): ChunkResult!
+
+  validators(
+    blockId: String
+  ): EpochValidatorInfo!
+
+  experimental_protocolConfig(
+    blockReference: BlockReference!
+  ): NearProtocolConfig!
+
+  lightClientProof(
+    request: LightClientProofRequest!
+  ): LightClientProof!
+
+  accessKeyChanges(
+    accountIdArray: [String!]!
+    blockQuery: BlockReference!
+  ): ChangeResult!
+
+  singleAccessKeyChanges(
+    accessKeyArray: [AccessKeyWithPublicKey!]!,
+    blockQuery: BlockReference
+  ): ChangeResult
+
+  accountChanges(
+    accountIdArray: [String!]!
+    blockQuery: BlockReference!
+  ): ChangeResult!
+
+  contractStateChanges(
+    accountIdArray: [String!]!
+    blockQuery: BlockReference!
+    keyPrefix: String
+  ): ChangeResult!
+
+  contractCodeChanges(
+    accountIdArray: [String!]!
+    blockQuery: BlockReference!
+  ): ChangeResult!
+
+  gasPrice(
+    blockId: String
+  ): BigInt!
+}
+
+# Based on these types from near-api-js:
+# export type Finality = 'optimistic' | 'near-final' | 'final'
+# export type BlockReference2 = { blockId: BlockId } | { finality: Finality } | { sync_checkpoint: 'genesis' | 'earliest_available' }
+type BlockReference {
+  block_id: String
+  finality: String
+  syncCheckpoint: String
+}
+
+type BlockHeader {
+  height: BigInt!
+  epoch_id: String!
+  next_epoch_id: String!
+  hash: String!
+  prev_hash: String!
+  prev_state_root: String!
+  chunk_receipts_root: String!
+  chunk_headers_root: String!
+  chunk_tx_root: String!
+  outcome_root: String!
+  chunks_included: BigInt!
+  challenges_root: String!
+  timestamp: BigInt!
+  timestamp_nanosec: String!
+  random_value: String!
+  validator_proposals: [JSON!]!
+  chunk_mask: [Boolean!]!
+  gas_price: String!
+  rent_paid: String!
+  validator_reward: String!
+  total_supply: String!
+  challenges_result: [JSON!]!
+  last_final_block: String!
+  last_ds_final_block: String!
+  next_bp_hash: String!
+  block_merkle_root: String!
+  approvals: [String]!
+  signature: String!
+  latest_protocol_version: BigInt!
+}
+
+type Chunk {
+  chunk_hash: String!
+  prev_block_hash: String!
+  outcome_root: String!
+  prev_state_root: String!
+  encoded_merkle_root: String!
+  encoded_length: BigInt!
+  height_created: BigInt!
+  height_included: BigInt!
+  shard_id: BigInt!
+  gas_used: BigInt!
+  gas_limit: BigInt!
+  rent_paid: String!
+  validator_reward: String!
+  balance_burnt: String!
+  outgoing_receipts_root: String!
+  tx_root: String!
+  validator_proposals: [JSON!]!
+  signature: String!
+}
+
+type BlockResult {
+  author: String!
+  header: BlockHeader!
+  chunks: [Chunk!]!
+}
+
+type ChunkHeader {
+  balance_burnt: String!
+  chunk_hash: String!
+  encoded_length: BigInt!
+  encoded_merkle_root: String!
+  gas_limit: BigInt!
+  gas_used: String!
+  height_created: BigInt!
+  height_included: BigInt!
+  outgoing_receipts_root: String!
+  prev_block_hash: String!
+  #prev_state_num_parts: BigInt!
+  prev_state_root: String!
+  rent_paid: String!
+  shard_id: BigInt!
+  signature: String!
+  tx_root: String!
+  validator_proposals: [JSON!]!
+  validator_reward: String!
+}
+
+type KeyValuePair {
+  key: String!
+  value: String!
+}
+
+type ChunkResult {
+  header: ChunkHeader!
+  receipts: [JSON!]!
+  transactions: [Near_Transaction!]!
+}
+
+type BlockChange {
+  changeType: String!
+  account_id: String!
+}
+
+type BlockChangeResult {
+  block_hash: String!
+  changes: [BlockChange!]!
+}
+
+type SyncInfo {
+  latest_block_hash: String!
+  latest_block_height: BigInt!
+  latest_block_time: String!
+  latest_state_root: String!
+  syncing: Boolean!
+}
+
+type Version {
+  version: String!
+  build: String!
+}
+
+type NodeStatusResult {
+  chain_id: String!
+  rpc_addr: String!
+  sync_info: SyncInfo!
+  validators: [String!]!
+  version: Version!
+}
+
+type CurrentEpochValidatorInfo {
+  account_id: String!
+  public_key: String!
+  is_slashed: Boolean!
+  stake: String!
+  shards: [BigInt!]!
+  num_produced_blocks: UInt!
+  num_expected_blocks: UInt!
+}
+
+type NextEpochValidatorInfo {
+  account_id: String!
+  public_key: String!
+  stake: String!
+  shards: [BigInt!]!
+}
+
+type ValidatorStakeView {
+  account_id: String!
+  public_key: String!
+  stake: String!
+}
+
+type EpochValidatorInfo {
+  next_validators: [NextEpochValidatorInfo!]!
+  current_validators: [CurrentEpochValidatorInfo!]!
+  next_fisherman: [ValidatorStakeView!]!
+  current_fisherman: [ValidatorStakeView!]!
+  current_proposals: [ValidatorStakeView!]!
+  prev_epoch_kickout: [ValidatorStakeView!]!
+  epoch_start_height: BigInt!
+  epoch_height: BigInt!
+}
+
+type NearProtocolConfig {
+  runtime_config: NearProtocolRuntimeConfig!
+}
+
+type NearProtocolRuntimeConfig {
+  storage_amount_per_byte: String!
+}
+
+type BlockHeaderInnerLiteView {
+  height: BigInt!
+  epoch_id: String!
+  next_epoch_id: String!
+  prev_state_root: String!
+  outcome_root: String!
+  timestamp: BigInt!
+  next_bp_hash: String!
+  block_merkle_root: String!
+}
+
+type LightClientBlockLiteView {
+  prev_block_hash: String!
+  inner_rest_hash: String!
+  inner_lite: BlockHeaderInnerLiteView!
+}
+
+type LightClientProof {
+  outcome_proof: Near_ExecutionOutcomeWithId!
+  outcome_root_proof: [Near_ExecutionProof!]!
+  block_header_lite: LightClientBlockLiteView!
+  block_proof: [Near_ExecutionProof!]!
+}
+
+# All query responses implement QueryResponseKind
+type QueryResponseKind {
+  blockHeight: BigInt!
+  blockHash: String!
+}
+
+type AccountView implements QueryResponseKind {
+  amount: String!
+  locked: String!
+  codeHash: String!
+  storageUsage: BigInt!
+  storagePaidAt: BigInt!
+}
+
+type  ViewContractCode {
+  code_base64: String!
+  hash: String!
+  block_height: BigInt!
+  block_hash: String!
+}
+
+type AccountBalance {
+  total: String!
+  stateStaked: String!
+  staked: String!
+  available: String!
+}
+
+type AccountAuthorizedApp {
+  contractId: String!
+  amount: String!
+  publicKey: String!
+}
+
+# Access key permissions determine how an account is allow to interact with a contract
+type AccessKeyPermission {
+  isFullAccess: Boolean!
+  receiverId: String
+  methodNames: [String!]
+  allowance: BigInt
+}
+
+type AccessKey {
+  nonce: BigInt!
+  permission: AccessKeyPermission!
+}
+
+type KeyVulueCode {
+  code_base64: String!
+  hash: String!
+  block_height: BigInt!
+  block_hash: String!
+}
+# Access keys contain access key permissions, which determine how an account is allowed to interact with a contract
+type AccessKeyInfo {
+  publicKey: String!
+  accessKey: AccessKey!
+}
+
+enum IdType {
+  transaction
+  receipt
+}
+
+type LightClientProofRequest {
+  type: IdType!
+  light_client_head: String!
+  transaction_hash: String
+  sender_id: String
+  receipt_id: String
+  receiver_id: String
+}
+
+type ChangeResult {
+  block_hash: String!
+  changes: [JSON!]!
+}
+
+type AccessKeyWithPublicKey {
+  account_id: String!
+  public_key: String!
+}
+
+type ContractStateResult {
+  values: [KeyValuePair!]!
+}

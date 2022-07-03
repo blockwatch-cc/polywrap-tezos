@@ -1,0 +1,8 @@
+format: 0.0.1-prealpha.1
+docker:
+  name: concurrent-promise-demo
+config:
+  node_version: "14.17.0"
+  include:
+    - ./package.json
+    - ./src

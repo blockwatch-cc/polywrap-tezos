@@ -1,6 +1,9 @@
 name: CI
 
-on: [pull_request]
+on:
+  pull_request:
+    paths:
+      - 'system/console/**'
 
 jobs:
   CI:
@@ -14,7 +17,7 @@ jobs:
       - name: Read .nvmrc
         run: echo ::set-output name=NVMRC::$(cat .nvmrc)
         id: console-nvm
-        working-directory: ./console/wrapper
+        working-directory: ./system/console/wrapper
 
       - name: Setup Node.js
         uses: actions/setup-node@master
@@ -23,12 +26,12 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --nonInteractive --frozen-lockfile --prefer-offline
-        working-directory: ./console/wrapper
+        working-directory: ./system/console/wrapper
 
       - name: Build
         run: yarn build
-        working-directory: ./console/wrapper
+        working-directory: ./system/console/wrapper
 
       - name: Test
         run: yarn test:ci
-        working-directory: ./console/wrapper
+        working-directory: ./system/console/wrapper
