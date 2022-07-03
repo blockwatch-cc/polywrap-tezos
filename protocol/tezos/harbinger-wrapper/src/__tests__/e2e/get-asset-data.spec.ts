@@ -33,11 +33,11 @@ describe("Query", () => {
                       mainnet: {
                           provider: "https://rpc.tzstats.com"
                       },  
-                      testnet: {
-                          provider: "https://rpc.granada.tzstats.com",
+                      ghostnet: {
+                          provider: "https://rpc.ghost.tzstats.com",
                       }
                   },
-                  defaultNetwork: "testnet"
+                  defaultNetwork: "mainnet"
                 })
             },
             ...getPlugins(testEnv.ipfs, testEnv.ensAddress, testEnv.ethereum),
@@ -79,37 +79,6 @@ describe("Query", () => {
         expect(response.data?.getAssetData.volume).toBeDefined()
         expect(response.data?.getAssetData.endPeriod).toBeDefined()
         expect(response.data?.getAssetData.startPeriod).toBeDefined()
-    })
-
-    it.skip("should get asset data for `XTZ-USD` on granadanet", async () => {
-      const response =  await client.query<{ getAssetData: QuerySchema.AssetCandle}>({
-        uri: ensUri,
-        query: `
-        query {
-          getAssetData(
-            assetCode: $assetCode,
-            network: granadanet,
-            providerAddress: $providerAddress
-            )
-          }
-          `,
-          variables: {
-            assetCode: "XTZ-USD",
-            providerAddress: "KT1ENR6CK7cBWCtZt1G3PovwTw3FgSW472mS"
-          }
-        })
-      
-      expect(response.errors).toBeUndefined()
-      expect(response.data).toBeDefined()
-      expect(response.data?.getAssetData).toBeDefined()
-      expect(response.data?.getAssetData.low).toBeDefined()
-      expect(response.data?.getAssetData.open).toBeDefined()
-      expect(response.data?.getAssetData.high).toBeDefined()
-      expect(response.data?.getAssetData.asset).toBeDefined()
-      expect(response.data?.getAssetData.close).toBeDefined()
-      expect(response.data?.getAssetData.volume).toBeDefined()
-      expect(response.data?.getAssetData.endPeriod).toBeDefined()
-      expect(response.data?.getAssetData.startPeriod).toBeDefined()
     })
 
     it("should get asset data for `XTZ-USD` on custom network", async () => {
@@ -205,7 +174,7 @@ describe("Query", () => {
             `,
             variables: {
               providerAddress: "KT1AdbYiPYb5hDuEuVrfxmFehtnBCXv4Np7r",
-              network: "granadanet",
+              network: "mainnet",
             }
           })
   
@@ -231,7 +200,7 @@ describe("Query", () => {
             variables: {
               providerAddress: "KT1Jr5t9UvGiqkvvsuUbPJHaYx24NzdUwNW9",
               assetCode: "XTZ-USD",
-              network: "granadanet",
+              network: "mainnet",
             }
           })
   
@@ -265,7 +234,7 @@ describe("Query", () => {
             variables: {
               providerAddress: "KT1AdbYiPYb5hDuEuVrfxmFehtnBCXv4Np7r",
               assetCode: "XTZ-USD",
-              network: "granadanet",
+              network: "mainnet",
             }
           })
   

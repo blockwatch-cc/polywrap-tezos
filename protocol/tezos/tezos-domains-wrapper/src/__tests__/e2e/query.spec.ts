@@ -33,11 +33,11 @@ describe("Query", () => {
                     mainnet: {
                         provider: "https://rpc.tzstats.com"
                     },  
-                    ithacanet: {
-                        provider: "https://rpc.ithaca.tzstats.com",
+                    ghostnet: {
+                        provider: "https://rpc.ghost.tzstats.com",
                     }
                 },
-                defaultNetwork: "ithacanet"
+                defaultNetwork: "ghostnet"
               })
           },
           ...getPlugins(testEnv.ipfs, testEnv.ensAddress, testEnv.ethereum),

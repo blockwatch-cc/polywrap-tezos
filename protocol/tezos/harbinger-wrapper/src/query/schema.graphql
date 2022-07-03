@@ -32,9 +32,9 @@ type Providers {
 
 """ Wrapper supported networks """
 enum Network {
-  custom
   mainnet
-  hangzhounet
+  ghostnet
+  custom
 }
 
 """ Custom Connection """

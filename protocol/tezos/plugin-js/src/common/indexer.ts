@@ -4,9 +4,7 @@ import axios from "axios"
 
 const IndexerConfig: Record<string, string> = {
     "mainnet": "https://api.tzstats.com",
-    "granadanet": "https://api.granada.tzstats.com",
-    "hangzhounet": "https://api.hangzhou.tzstats.com",
-    "ithacanet": "https://api.ithaca.tzstats.com"
+    "ghostnet": "https://api.ghost.tzstats.com"
 }
 
 const indexerClient = axios.create({
