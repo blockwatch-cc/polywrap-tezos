@@ -16,11 +16,9 @@ import {
 import { JSON } from "assemblyscript-json"; 
 
 // Provide default oracle contract addresses for network
-// @link for contract references - https://github.com/tacoinfra/harbinger
-// Below are contract addresses
-// NB: Florencenet is not supported because there are no available public rpc node
-// MainNet    -> KT1Jr5t9UvGiqkvvsuUbPJHaYx24NzdUwNW9
-// Granadanet -> KT1ENR6CK7cBWCtZt1G3PovwTw3FgSW472mS
+// Contract source: https://github.com/tacoinfra/harbinger
+// Mainnet deployment: KT1Jr5t9UvGiqkvvsuUbPJHaYx24NzdUwNW9
+
 
 export function listProviders(): Providers[] {
   return [
@@ -36,16 +34,6 @@ export function listProviders(): Providers[] {
           Network: "mainnet",
           Kind: "Normalizer",
           ContractAddress: "KT1AdbYiPYb5hDuEuVrfxmFehtnBCXv4Np7r"
-        },
-        {
-          Network: "granadanet",
-          Kind: "Storage",
-          ContractAddress: "KT1ENR6CK7cBWCtZt1G3PovwTw3FgSW472mS"
-        },
-        {
-          Network: "granadanet",
-          Kind: "Normalizer",
-          ContractAddress: "KT1MwuujtBodVQFm1Jk1KTGNc49wygqoLvpe"
         }
       ]
     },
