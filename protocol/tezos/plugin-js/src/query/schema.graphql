@@ -3,9 +3,7 @@
 """ Supported networks for getting operation status """
 enum GetOperationStatusSupportedNetworks {
   mainnet
-  hangzhounet
-  granadanet
-  ithacanet
+  ghostnet
 }
 
 """ Describes the status of a transaction """
