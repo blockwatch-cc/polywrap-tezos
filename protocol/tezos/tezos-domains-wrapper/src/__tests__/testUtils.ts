@@ -11,7 +11,7 @@ export const getPlugins = (ipfs: string, ensAddress: string, ethereum: string): 
         {
             uri: "w3://ens/tezosDomainsPlugin.web3api.eth",
             plugin: tezosDomainsPlugin({
-                defaultNetwork: "ithacanet"
+                defaultNetwork: "ghostnet"
             })
         },
         {
@@ -51,7 +51,7 @@ export const waitForConfirmation = async (client: Web3ApiClient, hash: string, c
           query {
             getOperationStatus(
               hash: $hash
-              network: ithacanet
+              network: ghostnet
             )
           }
         `,

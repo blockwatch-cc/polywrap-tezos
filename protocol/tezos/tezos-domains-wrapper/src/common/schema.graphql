@@ -4,9 +4,7 @@
 enum Network {
   custom
   mainnet
-  granadanet
-  hangzhounet
-  ithacanet
+  ghostnet
 }
 
 """ Describes domain information """

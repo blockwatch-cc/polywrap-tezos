@@ -17,26 +17,12 @@ export class Address {
       throw new Error(`action '${action}' is not supported`);
     }
     switch (network) {
-      case Network.ithacanet:
-        contractAddress = DefaultAddresses.get(`Ithacanet.${action}`);
+      case Network.ghostnet:
+        contractAddress = DefaultAddresses.get(`Jakarta.${action}`);
         connection = <Tezos_Connection> {
-          provider: "https://rpc.ithaca.tzstats.com",
-          networkNameOrChainId: "ithacanet"
+          provider: "https://rpc.ghost.tzstats.com",
+          networkNameOrChainId: "ghostnet"
         };
-        break;
-      case Network.granadanet: 
-        contractAddress = DefaultAddresses.get(`Granadanet.${action}`);
-        connection = <Tezos_Connection> {
-          provider: "https://rpc.granada.tzstats.com",
-          networkNameOrChainId: "granadanet"  
-        }
-        break;
-      case Network.hangzhounet: 
-        contractAddress = DefaultAddresses.get(`Hangzhounet.${action}`);
-        connection = <Tezos_Connection> {
-          provider: "https://rpc.hangzhou.tzstats.com",
-          networkNameOrChainId: "hangzhounet"  
-        }
         break;
       case Network.mainnet: 
         contractAddress = DefaultAddresses.get(`Mainnet.${action}`);
