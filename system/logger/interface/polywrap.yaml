@@ -1,0 +1,5 @@
+format: 0.0.1-prealpha.9
+name: logger-interface
+language: interface
+schema: ./src/schema.graphql
+deploy: ./polywrap.deploy.yaml

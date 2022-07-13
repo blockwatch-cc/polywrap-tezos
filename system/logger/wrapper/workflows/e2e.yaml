@@ -1,0 +1,25 @@
+name: hello-world
+jobs:
+  cases:
+    steps:
+      - uri: fs/./build
+        method: log
+        args:
+          level: 0
+          message: "DEBUG"
+      - uri: fs/./build
+        method: debug
+        args:
+          message: "DEBUG"
+      - uri: fs/./build
+        method: info
+        args:
+          message: "INFO"
+      - uri: fs/./build
+        method: warn
+        args:
+          message: "WARN"
+      - uri: fs/./build
+        method: error
+        args:
+          message: "ERROR"

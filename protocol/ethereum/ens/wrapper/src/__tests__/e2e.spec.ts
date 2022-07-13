@@ -1,9 +1,11 @@
 import {
-  buildAndDeployApi,
+  buildAndDeployWrapper,
   initTestEnvironment,
   stopTestEnvironment,
-} from "@web3api/test-env-js";
-import { Web3ApiClient } from "@web3api/client-js";
+  providers as testEnvProviders,
+  ensAddresses,
+} from "@polywrap/test-env-js";
+import { PolywrapClient } from "@polywrap/client-js";
 import path from "path";
 import { providers } from "ethers";
 
@@ -14,12 +16,12 @@ jest.setTimeout(300000);
 describe("ENS Wrapper", () => {
   // We will have two clients because we need two
   // different signers in order to test ENS functions
-  let ownerClient: Web3ApiClient;
-  let anotherOwnerClient: Web3ApiClient;
+  let ownerClient: PolywrapClient;
+  let anotherOwnerClient: PolywrapClient;
 
   let ensUri: string;
   let ethersProvider: providers.JsonRpcProvider;
-  let ensAddress: string;
+  let registryAddress: string;
   let registrarAddress: string;
   let resolverAddress: string;
   let reverseRegistryAddress: string;
@@ -35,42 +37,40 @@ describe("ENS Wrapper", () => {
   const network: string = "testnet";
 
   beforeAll(async () => {
-    const {
-      ensAddress: ensRegistryAddress,
-      registrarAddress: ensRegistrarAddress,
-      resolverAddress: ensResolverAddress,
-      reverseAddress: ensReverseAddress,
-      ipfs,
-      ethereum,
-    } = await initTestEnvironment();
+    await initTestEnvironment();
 
     // deploy api
     const apiPath: string = path.resolve(__dirname + "/../../");
-    const api = await buildAndDeployApi(apiPath, ipfs, ensRegistryAddress);
+    const api = await buildAndDeployWrapper({
+      wrapperAbsPath: apiPath,
+      ethereumProvider: testEnvProviders.ethereum,
+      ipfsProvider: testEnvProviders.ipfs,
+      ensName: "test-domain.eth"
+    });
     ensUri = `ens/testnet/${api.ensDomain}`;
 
     // set up ethers provider
     ethersProvider = providers.getDefaultProvider(
-      "http://localhost:8546"
+      testEnvProviders.ethereum
     ) as providers.JsonRpcProvider;
     owner = await ethersProvider.getSigner(0).getAddress();
     anotherOwner = await ethersProvider.getSigner(1).getAddress();
-    ensAddress = ensRegistryAddress;
-    registrarAddress = ensRegistrarAddress;
-    resolverAddress = ensResolverAddress;
-    reverseRegistryAddress = ensReverseAddress;
+    registryAddress = ensAddresses.ensAddress;
+    registrarAddress = ensAddresses.registrarAddress;
+    resolverAddress = ensAddresses.resolverAddress;
+    reverseRegistryAddress = ensAddresses.reverseAddress;
 
     // get client
-    const plugins = getPlugins(ethereum, ipfs, ensRegistryAddress);
-    ownerClient = new Web3ApiClient({ plugins });
+    const plugins = getPlugins(testEnvProviders.ethereum, testEnvProviders.ipfs, ensAddresses.ensAddress);
+    ownerClient = new PolywrapClient({ plugins });
 
     const anotherOwnerRedirects = getPlugins(
-      ethereum,
-      ipfs,
-      ensRegistryAddress,
+      testEnvProviders.ethereum, 
+      testEnvProviders.ipfs, 
+      ensAddresses.ensAddress, 
       anotherOwner
     );
-    anotherOwnerClient = new Web3ApiClient({ plugins: anotherOwnerRedirects });
+    anotherOwnerClient = new PolywrapClient({ plugins: anotherOwnerRedirects });
   });
 
   afterAll(async () => {
@@ -78,200 +78,134 @@ describe("ENS Wrapper", () => {
   });
 
   it("should register domain", async () => {
-    const variables = {
-      domain: customTld,
-      owner,
-      registryAddress: ensAddress,
-      registrarAddress: registrarAddress,
-      network,
-    };
-
     const {
       data: registerData,
-      errors: registerErrors,
-    } = await ownerClient.query<{
-      registerDomain: string;
-    }>({
+      error: registerError,
+    } = await ownerClient.invoke<string>({
       uri: ensUri,
-      query: `mutation {
-        registerDomain(
-          domain: $domain
-          owner: $owner
-          registrarAddress: $registrarAddress
-          registryAddress: $registryAddress
-          connection: {
-            networkNameOrChainId: $network
-          }
-        )
-      }`,
-      variables,
+      method: "registerDomain",
+      args: {
+        domain: customTld,
+        owner,
+        registryAddress,
+        registrarAddress: registrarAddress,
+        connection: {
+          networkNameOrChainId: network
+        }
+      }
     });
 
-    expect(registerData?.registerDomain).toBeDefined();
-    expect(registerErrors).toBeUndefined();
+    expect(registerData).toBeDefined();
+    expect(registerError).toBeUndefined();
   });
 
   it("should set and get resolver", async () => {
-    const setResolverVariables = {
-      domain: customTld,
-      owner,
-      registry: ensAddress,
-      resolver: resolverAddress,
-      network,
-    };
     const {
       data: setResolverData,
-      errors: setResolverErrors,
-    } = await ownerClient.query({
+      error: setResolverError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        mutation {
-          setResolver(
-            domain: $domain
-            resolverAddress: $resolver
-            registryAddress: $registry
-            owner: $owner
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "setResolver", 
+      args: {
+        domain: customTld,
+        owner,
+        registryAddress,
+        resolverAddress: resolverAddress,
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: setResolverVariables,
+      }
     });
 
-    expect(setResolverData?.setResolver).toBeDefined();
-    expect(setResolverErrors).toBeUndefined();
-
-    const getResolverVariables = {
-      domain: customTld,
-      registry: ensAddress,
-      network,
-    };
+    expect(setResolverData).toBeDefined();
+    expect(setResolverError).toBeUndefined();
 
     const {
       data: getResolverData,
-      errors: getResolverErrors,
-    } = await ownerClient.query({
+      error: getResolverError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        query {
-          getResolver(
-            domain: $domain
-            registryAddress: $registry
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "getResolver",
+      args: {
+        domain: customTld,
+        registryAddress,
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: getResolverVariables,
+      }
     });
 
-    expect(getResolverData?.getResolver).toEqual(resolverAddress);
-    expect(getResolverErrors).toBeUndefined();
+    expect(getResolverData).toEqual(resolverAddress);
+    expect(getResolverError).toBeUndefined();
   });
 
   it("should set owner of subdomain and fetch it", async () => {
     const subdomain = "bob." + customTld;
-    const setSubdomainOwnerVariables = {
-      subdomain,
-      owner,
-      registry: ensAddress,
-      network,
-    };
 
     const {
       data: setSubdomainOwnerData,
-      errors: setSubdomainErrors,
-    } = await ownerClient.query({
+      error: setSubdomainError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        mutation {
-          setSubdomainOwner(
-            subdomain: $subdomain
-            owner: $owner
-            registryAddress: $registry
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "setSubdomainOwner",
+      args: {
+        subdomain,
+        owner,
+        registryAddress,
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: setSubdomainOwnerVariables,
+      }
     });
 
-    expect(setSubdomainOwnerData?.setSubdomainOwner).toBeDefined();
-    expect(setSubdomainErrors).toBeUndefined();
-
-    const getOwnerVariables = {
-      domain: subdomain,
-      registry: ensAddress,
-      network,
-    };
+    expect(setSubdomainOwnerData).toBeDefined();
+    expect(setSubdomainError).toBeUndefined();
 
     const {
       data: getOwnerData,
-      errors: getOwnerErrors,
-    } = await ownerClient.query({
+      error: getOwnerError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        query {
-          getOwner(
-            domain: $domain
-            registryAddress: $registry
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "getOwner",
+      args: {
+        domain: subdomain,
+        registryAddress,
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: getOwnerVariables,
+      }
     });
 
-    expect(getOwnerData?.getOwner).toBeDefined();
-    expect(getOwnerErrors).toBeUndefined();
+    expect(getOwnerData).toBeDefined();
+    expect(getOwnerError).toBeUndefined();
   });
 
   it("should register domain with subdomains recursively and fetch it", async () => {
     const domain = "foo.bar.baz.mydomain.eth";
-    const registerDomainAndSubdomainsRecursivelyVariables = {
-      domain,
-      owner,
-      registryAddress: ensAddress,
-      resolverAddress,
-      ttl: '0',
-      registrarAddress,
-      network,
-    };
 
     const {
       data: registerDomainAndSubdomainsRecursivelyData,
-      errors: registerDomainAndSubdomainsRecursivelyErrors,
-    } = await ownerClient.query({
+      error: registerDomainAndSubdomainsRecursivelyError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        mutation {
-          registerDomainAndSubdomainsRecursively(
-            domain: $domain
-            owner: $owner
-            registryAddress: $registryAddress
-            resolverAddress: $resolverAddress
-            registrarAddress: $registrarAddress
-            ttl: $ttl
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "registerDomainAndSubdomainsRecursively",
+      args: {
+        domain,
+        owner,
+        registryAddress,
+        resolverAddress,
+        registrarAddress,
+        ttl: '0',
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: registerDomainAndSubdomainsRecursivelyVariables,
+      }
     });
 
-    expect(registerDomainAndSubdomainsRecursivelyData?.registerDomainAndSubdomainsRecursively).toBeDefined();
-    expect(registerDomainAndSubdomainsRecursivelyErrors).toBeUndefined();
+    expect(registerDomainAndSubdomainsRecursivelyData).toBeDefined();
+    expect(registerDomainAndSubdomainsRecursivelyError).toBeUndefined();
     
-    const resultingRegistrations = registerDomainAndSubdomainsRecursivelyData?.registerDomainAndSubdomainsRecursively as any[];
+    const resultingRegistrations = registerDomainAndSubdomainsRecursivelyData as any[];
 
     expect(resultingRegistrations[0]?.name).toBe("mydomain.eth")
     expect(resultingRegistrations[0]?.didRegister).toBe(true)
@@ -284,71 +218,50 @@ describe("ENS Wrapper", () => {
 
     const {
       data: getOwnerData,
-      errors: getOwnerErrors,
-    } = await ownerClient.query({
+      error: getOwnerError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        query {
-          getOwner(
-            domain: $domain
-            registryAddress: $registry
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
-        }
-      `,
-      variables: {
+      method: "getOwner",
+      args: {
         domain,
-        registry: ensAddress,
-        network,
-      },
+        registryAddress,
+        connection: {
+          networkNameOrChainId: network
+        }
+      }
     });
 
-    expect(getOwnerData?.getOwner).toBeDefined();
-    expect(getOwnerErrors).toBeUndefined();
-    expect(getOwnerData?.getOwner).toBe(owner);
+    expect(getOwnerError).toBeUndefined();
+    expect(getOwnerData).toBeDefined();
+    expect(getOwnerData).toBe(owner);
 
     // No subdomain
 
     const domainWithNoSubdomain = "sumtin.eth";
-    const domainWithNoSubdomainVariables = {
-      domain: domainWithNoSubdomain,
-      owner,
-      registryAddress: ensAddress,
-      resolverAddress,
-      ttl: '0',
-      registrarAddress,
-      network,
-    };
-
+  
     const {
       data: domainWithNoSubdomainData,
-      errors: domainWithNoSubdomainErrors,
-    } = await ownerClient.query({
+      error: domainWithNoSubdomainError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        mutation {
-          registerDomainAndSubdomainsRecursively(
-            domain: $domain
-            owner: $owner
-            registryAddress: $registryAddress
-            resolverAddress: $resolverAddress
-            registrarAddress: $registrarAddress
-            ttl: $ttl
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "registerDomainAndSubdomainsRecursively",
+      args: {
+        domain: domainWithNoSubdomain,
+        owner,
+        registryAddress,
+        resolverAddress,
+        registrarAddress,
+        ttl: '0',
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: domainWithNoSubdomainVariables,
+      }
     });
 
-    expect(domainWithNoSubdomainData?.registerDomainAndSubdomainsRecursively).toBeDefined();
-    expect(domainWithNoSubdomainErrors).toBeUndefined();
+    expect(domainWithNoSubdomainData).toBeDefined();
+    expect(domainWithNoSubdomainError).toBeUndefined();
     
-    const domainWithNoSubdomainRegistrations = domainWithNoSubdomainData?.registerDomainAndSubdomainsRecursively as any[];
+    const domainWithNoSubdomainRegistrations = domainWithNoSubdomainData as any[];
 
     expect(domainWithNoSubdomainRegistrations[0]?.name).toBe("sumtin.eth")
   });
@@ -359,117 +272,73 @@ describe("ENS Wrapper", () => {
     const tld = `${label}.${rootDomain}`
     const subdomain = `already.registered.${tld}`;
 
-    await ownerClient.query<{
-      registerDomain: string;
-    }>({
+    await ownerClient.invoke<string>({
       uri: ensUri,
-      query: `mutation {
-        registerDomain(
-          domain: $domain
-          owner: $owner
-          registrarAddress: $registrarAddress
-          registryAddress: $registryAddress
-          connection: {
-            networkNameOrChainId: $network
-          }
-        )
-      }`,
-      variables: {
+      method: "",
+      args: {
         domain: tld,
         owner,
-        registryAddress: ensAddress,
-        registrarAddress: registrarAddress,
-        network,
-      },
-    });
-
-    await ownerClient.query<{
-      registerDomain: string;
-    }>({
-      uri: ensUri,
-      query: `mutation {
-        registerDomain(
-          domain: $domain
-          owner: $owner
-          registrarAddress: $registrarAddress
-          registryAddress: $registryAddress
-          connection: {
-            networkNameOrChainId: $network
-          }
-        )
-      }`,
-      variables: {
-        domain: rootDomain,
-        owner,
-        registryAddress: ensAddress,
-        registrarAddress: registrarAddress,
-        network,
-      },
-    });
-
-    await ownerClient.query({
-      uri: ensUri,
-      query: `
-        mutation {
-          setSubdomainRecord(
-            domain: $domain
-            label: $label
-            owner: $owner
-            registryAddress: $registry
-            resolverAddress: $resolver
-            ttl: $ttl
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+        registryAddress,
+        registrarAddress,
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: {
+      }
+    });
+
+    await ownerClient.invoke<string>({
+      uri: ensUri,
+      method: "registerDomain",
+      args: {
         domain: rootDomain,
         owner,
-        registry: ensAddress,
-        resolver: resolverAddress,
-        ttl: "0",
+        registryAddress,
+        registrarAddress,
+        connection: {
+          networkNameOrChainId: network
+        }
+      }
+    });
+
+    await ownerClient.invoke({
+      uri: ensUri,
+      method: "setSubdomainRecord",
+      args: {
+        domain: rootDomain,
         label,
-        network,
-      },
+        owner,
+        registryAddress,
+        resolverAddress,
+        ttl: '0',
+        connection: {
+          networkNameOrChainId: network
+        }
+      }
     });
 
     const {
       data: registerDomainAndSubdomainsRecursivelyData,
-      errors: registerDomainAndSubdomainsRecursivelyErrors,
-    } = await ownerClient.query({
+      error: registerDomainAndSubdomainsRecursivelyError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        mutation {
-          registerDomainAndSubdomainsRecursively(
-            domain: $domain
-            owner: $owner
-            registryAddress: $registryAddress
-            resolverAddress: $resolverAddress
-            registrarAddress: $registrarAddress
-            ttl: $ttl
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
-        }
-      `,
-      variables: {
+      method: "registerDomainAndSubdomainsRecursively",
+      args: {
         domain: subdomain,
         owner,
-        registryAddress: ensAddress,
+        registryAddress,
         resolverAddress,
-        ttl: '0',
         registrarAddress,
-        network,
-      },
+        ttl: '0',
+        connection: {
+          networkNameOrChainId: network
+        }
+      }
     });
 
-    expect(registerDomainAndSubdomainsRecursivelyData?.registerDomainAndSubdomainsRecursively).toBeDefined();
-    expect(registerDomainAndSubdomainsRecursivelyErrors).toBeUndefined();
+    expect(registerDomainAndSubdomainsRecursivelyData).toBeDefined();
+    expect(registerDomainAndSubdomainsRecursivelyError).toBeUndefined();
     
-    const resultingRegistrations = registerDomainAndSubdomainsRecursivelyData?.registerDomainAndSubdomainsRecursively as any[];
+    const resultingRegistrations = registerDomainAndSubdomainsRecursivelyData as any[];
 
     expect(resultingRegistrations[0]?.name).toBe("domain.eth")
     expect(resultingRegistrations[0]?.didRegister).toBe(false)
@@ -482,95 +351,65 @@ describe("ENS Wrapper", () => {
 
     const {
       data: getOwnerData,
-      errors: getOwnerErrors,
-    } = await ownerClient.query({
+      error: getOwnerError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        query {
-          getOwner(
-            domain: $domain
-            registryAddress: $registry
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
-        }
-      `,
-      variables: {
+      method: "getOwner",
+      args: {
         domain: subdomain,
-        registry: ensAddress,
-        network,
+        registryAddress,
+        connection: {
+          networkNameOrChainId: network
+        }
       },
     });
 
-    expect(getOwnerData?.getOwner).toBeDefined();
-    expect(getOwnerErrors).toBeUndefined();
-    expect(getOwnerData?.getOwner).toBe(owner);
+    expect(getOwnerData).toBeDefined();
+    expect(getOwnerError).toBeUndefined();
+    expect(getOwnerData).toBe(owner);
   });
 
   it("should register subdomain recursively and fetch it", async () => {
     const tld = "basedomain.eth";
     const subdomain = `aaa.bbb.ccc.${tld}`;
 
-    await ownerClient.query<{
-      registerDomain: string;
-    }>({
+    await ownerClient.invoke<string>({
       uri: ensUri,
-      query: `mutation {
-        registerDomain(
-          domain: $domain
-          owner: $owner
-          registrarAddress: $registrarAddress
-          registryAddress: $registryAddress
-          connection: {
-            networkNameOrChainId: $network
-          }
-        )
-      }`,
-      variables: {
+      method: "registerDomain",
+      args: {
         domain: tld,
         owner,
-        registryAddress: ensAddress,
-        registrarAddress: registrarAddress,
-        network,
-      },
+        registrarAddress,
+        registryAddress,
+        connection: {
+          networkNameOrChainId: network
+        }
+      }
     });
 
     const {
       data: registerSubdomainsRecursivelyData,
-      errors: registerSubdomainsRecursivelyErrors,
-    } = await ownerClient.query({
+      error: registerSubdomainsRecursivelyError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        mutation {
-          registerSubdomainsRecursively(
-            domain: $domain
-            owner: $owner
-            registryAddress: $registryAddress
-            resolverAddress: $resolverAddress
-            registrarAddress: $registrarAddress
-            ttl: $ttl
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
-        }
-      `,
-      variables: {
+      method: "registerSubdomainsRecursively",
+      args: {
         domain: subdomain,
         owner,
-        registryAddress: ensAddress,
+        registryAddress,
         resolverAddress,
-        ttl: '0',
         registrarAddress,
-        network,
-      },
+        ttl: '0',
+        connection: {
+          networkNameOrChainId: network
+        }
+      }
     });
 
-    expect(registerSubdomainsRecursivelyData?.registerSubdomainsRecursively).toBeDefined();
-    expect(registerSubdomainsRecursivelyErrors).toBeUndefined();
+    expect(registerSubdomainsRecursivelyData).toBeDefined();
+    expect(registerSubdomainsRecursivelyError).toBeUndefined();
     
-    const resultingRegistrations = registerSubdomainsRecursivelyData?.registerSubdomainsRecursively as any[];
+    const resultingRegistrations = registerSubdomainsRecursivelyData as any[];
 
     expect(resultingRegistrations[0]?.name).toBe("ccc.basedomain.eth")
     expect(resultingRegistrations[0]?.didRegister).toBe(true)
@@ -581,699 +420,459 @@ describe("ENS Wrapper", () => {
 
     const {
       data: getOwnerData,
-      errors: getOwnerErrors,
-    } = await ownerClient.query({
+      error: getOwnerError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        query {
-          getOwner(
-            domain: $domain
-            registryAddress: $registry
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
-        }
-      `,
-      variables: {
+      method: "getOwner",
+      args: {
         domain: subdomain,
-        registry: ensAddress,
-        network,
-      },
+        registryAddress,
+        connection: {
+          networkNameOrChainId: network
+        }
+      }
     });
 
-    expect(getOwnerData?.getOwner).toBeDefined();
-    expect(getOwnerErrors).toBeUndefined();
-    expect(getOwnerData?.getOwner).toBe(owner);
+    expect(getOwnerData).toBeDefined();
+    expect(getOwnerError).toBeUndefined();
+    expect(getOwnerData).toBe(owner);
   });
 
   it("should set subdomain owner, resolver and ttl", async () => {
-    const setSubdomainRecordVariables = {
-      domain: customTld,
-      owner: anotherOwner,
-      registry: ensAddress,
-      resolver: resolverAddress,
-      ttl: "0",
-      label: "john",
-      network,
-    };
-
     const {
       data: setSubdomainRecordData,
-      errors: setSubdomainRecordErrors,
-    } = await ownerClient.query({
+      error: setSubdomainRecordError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        mutation {
-          setSubdomainRecord(
-            domain: $domain
-            label: $label
-            owner: $owner
-            registryAddress: $registry
-            resolverAddress: $resolver
-            ttl: $ttl
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "setSubdomainRecord",
+      args: {
+        domain: customTld,
+        label: "john",
+        owner: anotherOwner,
+        registryAddress,
+        resolverAddress,
+        ttl: '0',
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: setSubdomainRecordVariables,
+      }
     });
 
-    expect(setSubdomainRecordData?.setSubdomainRecord).toBeDefined();
-    expect(setSubdomainRecordErrors).toBeUndefined();
-
-    const getOwnerVariables = {
-      domain: customSubdomain,
-      registry: ensAddress,
-      network,
-    };
+    expect(setSubdomainRecordData).toBeDefined();
+    expect(setSubdomainRecordError).toBeUndefined();
 
     const {
       data: getOwnerData,
-      errors: getOwnerErrors,
-    } = await ownerClient.query({
+      error: getOwnerError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        query {
-          getOwner(
-            domain: $domain
-            registryAddress: $registry
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "getOwner",
+      args: {
+        domain: customSubdomain,
+        registryAddress,
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: getOwnerVariables,
+      }
     });
-    expect(getOwnerData?.getOwner).toEqual(anotherOwner);
-    expect(getOwnerErrors).toBeUndefined();
+    expect(getOwnerData).toEqual(anotherOwner);
+    expect(getOwnerError).toBeUndefined();
   });
 
   it("should update and fetch owner", async () => {
-    const getOldOwnerVariables = {
-      domain: customSubdomain,
-      registry: ensAddress,
-      network,
-    };
-
     const {
       data: getOldOwnerData,
-      errors: getOldOwnerErrors,
-    } = await anotherOwnerClient.query({
+      error: getOldOwnerError,
+    } = await anotherOwnerClient.invoke({
       uri: ensUri,
-      query: `
-        query {
-          getOwner(
-            domain: $domain
-            registryAddress: $registry
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "getOwner",
+      args: {
+        domain: customSubdomain,
+        registryAddress,
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: getOldOwnerVariables,
+      }
     });
 
-    expect(getOldOwnerData?.getOwner).toEqual(anotherOwner);
-    expect(getOldOwnerErrors).toBeUndefined();
-
-    const setOwnerVariables = {
-      domain: customSubdomain,
-      newOwner: owner,
-      registry: ensAddress,
-      network,
-    };
+    expect(getOldOwnerData).toEqual(anotherOwner);
+    expect(getOldOwnerError).toBeUndefined();
 
     const {
       data: setOwnerData,
-      errors: setOwnerErrors,
-    } = await anotherOwnerClient.query({
+      error: setOwnerError,
+    } = await anotherOwnerClient.invoke({
       uri: ensUri,
-      query: `
-        mutation {
-          setOwner(
-            domain: $domain
-            newOwner: $newOwner
-            registryAddress: $registry
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "setOwner",
+      args: {
+        domain: customSubdomain,
+        newOwner: owner,
+        registryAddress,
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: setOwnerVariables,
+      }
     });
 
-    expect(setOwnerData?.setOwner).toBeDefined();
-    expect(setOwnerErrors).toBeUndefined();
-
-    const getNewOwnerVariables = {
-      domain: customSubdomain,
-      registry: ensAddress,
-      network,
-    };
+    expect(setOwnerData).toBeDefined();
+    expect(setOwnerError).toBeUndefined();
 
     const {
       data: getNewOwnerData,
-      errors: getNewOwnerErrors,
-    } = await ownerClient.query({
+      error: getNewOwnerError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        query {
-          getOwner(
-            domain: $domain
-            registryAddress: $registry
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "getOwner",
+      args: {
+        domain: customSubdomain,
+        registryAddress,
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: getNewOwnerVariables,
+      }
     });
 
-    expect(getNewOwnerData?.getOwner).toEqual(owner);
-    expect(getNewOwnerErrors).toBeUndefined();
+    expect(getNewOwnerData).toEqual(owner);
+    expect(getNewOwnerError).toBeUndefined();
   });
 
   it("should set content hash and fetch it", async () => {
     const cid = "0x64EC88CA00B268E5BA1A35678A1B5316D212F4F366B2477232534A8AECA37F3C".toLowerCase();
-    const setContentHashVariables = {
-      domain: customSubdomain,
-      cid,
-      resolver: resolverAddress,
-      network,
-    };
 
     const {
       data: setContentHashData,
-      errors: setContentHashErrors,
-    } = await ownerClient.query({
+      error: setContentHashError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        mutation {
-          setContentHash(
-            domain: $domain
-            cid: $cid
-            resolverAddress: $resolver
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "setContentHash",
+      args: {
+        domain: customSubdomain,
+        cid,
+        resolverAddress,
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: setContentHashVariables,
+      }
     });
 
-    expect(setContentHashData?.setContentHash).toBeDefined();
-    expect(setContentHashErrors).toBeUndefined();
-
-    const getContentHashVariables = {
-      domain: customSubdomain,
-      resolver: resolverAddress,
-      network,
-    };
+    expect(setContentHashData).toBeDefined();
+    expect(setContentHashError).toBeUndefined();
 
     const {
       data: getContentHashData,
-      errors: getContentHashErrors,
-    } = await ownerClient.query({
+      error: getContentHashError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        query {
-          getContentHash(
-            domain: $domain
-            resolverAddress: $resolver
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "getContentHash",
+      args: {
+        domain: customSubdomain,
+        resolverAddress,
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: getContentHashVariables,
+      },
     });
 
-    expect(getContentHashData?.getContentHash).toEqual(cid);
-    expect(getContentHashErrors).toBeUndefined();
-
-    const getContentHashFromDomainVariables = {
-      domain: customSubdomain,
-      registry: ensAddress,
-      network,
-    };
+    expect(getContentHashData).toEqual(cid);
+    expect(getContentHashError).toBeUndefined();
 
     const {
       data: getContentHashFromDomainData,
-      errors: getContentHashFromDomainErrors,
-    } = await ownerClient.query({
+      error: getContentHashFromDomainError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        query {
-          getContentHashFromDomain(
-            domain: $domain
-            registryAddress: $registry
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "getContentHashFromDomain",
+      args: {
+        domain: customSubdomain,
+        registryAddress,
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: getContentHashFromDomainVariables,
+      }
     });
 
-    expect(getContentHashFromDomainData?.getContentHashFromDomain).toEqual(cid);
-    expect(getContentHashFromDomainErrors).toBeUndefined();
+    expect(getContentHashFromDomainData).toEqual(cid);
+    expect(getContentHashFromDomainError).toBeUndefined();
   });
 
   it("should set address and fetch it", async () => {
-    const setAddressVariables = {
-      domain: customTld,
-      address: anotherOwner,
-      resolver: resolverAddress,
-      network,
-    };
-
     const {
       data: setAddressData,
-      errors: setAddressErrors,
-    } = await ownerClient.query({
+      error: setAddressError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        mutation {
-          setAddress(
-            domain: $domain
-            address: $address
-            resolverAddress: $resolver
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "setAddress",
+      args: {
+        domain: customTld,
+        address: anotherOwner,
+        resolverAddress,
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: setAddressVariables,
+      }
     });
 
     expect(setAddressData).toBeDefined();
-    expect(setAddressErrors).toBeUndefined();
-
-    const getAddressVariables = {
-      domain: customTld,
-      resolver: resolverAddress,
-      network,
-    };
+    expect(setAddressError).toBeUndefined();
 
     const {
       data: getAddressData,
-      errors: getAddressErrors,
-    } = await ownerClient.query({
+      error: getAddressError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        query {
-          getAddress(
-            domain: $domain
-            resolverAddress: $resolver
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "getAddress",
+      args: {
+        domain: customTld,
+        resolverAddress,
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: getAddressVariables,
+      }
     });
 
-    expect(getAddressData?.getAddress).toEqual(anotherOwner);
-    expect(getAddressErrors).toBeUndefined();
-
-    const getAddressFromDomainVariables = {
-      domain: customTld,
-      registry: ensAddress,
-      network,
-    };
+    expect(getAddressData).toEqual(anotherOwner);
+    expect(getAddressError).toBeUndefined();
 
     const {
       data: getAddressFromDomainData,
-      errors: getAddressFromDomainErrors,
-    } = await ownerClient.query({
+      error: getAddressFromDomainError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        query {
-          getAddressFromDomain(
-            domain: $domain
-            registryAddress: $registry
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "getAddressFromDomain",
+      args: {
+        domain: customTld,
+        registryAddress,
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: getAddressFromDomainVariables,
+      }
     });
 
-    expect(getAddressFromDomainData?.getAddressFromDomain).toEqual(
+    expect(getAddressFromDomainData).toEqual(
       anotherOwner
     );
-    expect(getAddressFromDomainErrors).toBeUndefined();
+    expect(getAddressFromDomainError).toBeUndefined();
   });
 
   it("should set reverse registry", async () => {
-    const serReverseRegistryVariables = {
-      domain: customTld,
-      owner,
-      reverseRegistry: reverseRegistryAddress,
-      network,
-    };
-
     const {
       data: reverseRegistryData,
-      errors: reverseRegistryErrors,
-    } = await ownerClient.query({
+      error: reverseRegistryError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        mutation {
-          reverseRegisterDomain(
-            domain: $domain
-            reverseRegistryAddress: $reverseRegistry
-            owner: $owner
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "reverseRegisterDomain",
+      args: {
+        domain: customTld,
+        reverseRegistryAddress,
+        owner,
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: serReverseRegistryVariables,
+      }
     });
 
-    expect(reverseRegistryData?.reverseRegisterDomain).toBeDefined();
-    expect(reverseRegistryErrors).toBeUndefined();
+    expect(reverseRegistryData).toBeDefined();
+    expect(reverseRegistryError).toBeUndefined();
   });
 
   it("should fetch name based on address from registry and resolver", async () => {
-    const getNameFromAddressVariables = {
-      address: owner,
-      registry: ensAddress,
-      network,
-    };
-
     const {
       data: getNameFromAddressData,
-      errors: getNameFromAddressErrors,
-    } = await ownerClient.query({
+      error: getNameFromAddressError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        query {
-          getNameFromAddress(
-            address: $address
-            registryAddress: $registry
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "getNameFromAddress",
+      args: {
+        address: owner,
+        registryAddress,
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: getNameFromAddressVariables,
+      }
     });
 
-    expect(getNameFromAddressData?.getNameFromAddress).toEqual(customTld);
-    expect(getNameFromAddressErrors).toBeUndefined();
-
-    const getNameFromReverseResolverVariables = {
-      address: owner,
-      resolver: resolverAddress,
-      network,
-    };
+    expect(getNameFromAddressData).toEqual(customTld);
+    expect(getNameFromAddressError).toBeUndefined();
 
     const {
       data: getNameFromReverseResolverData,
-      errors: getNameFromReverseResolverErrors,
-    } = await ownerClient.query({
+      error: getNameFromReverseResolverError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        query {
-          getNameFromReverseResolver(
-            address: $address
-            resolverAddress: $resolver
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "getNameFromReverseResolver",
+      args: {
+        address: owner,
+        resolverAddress,
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: getNameFromReverseResolverVariables,
+      }
     });
 
-    expect(getNameFromReverseResolverData?.getNameFromReverseResolver).toEqual(
+    expect(getNameFromReverseResolverData).toEqual(
       customTld
     );
-    expect(getNameFromReverseResolverErrors).toBeUndefined();
+    expect(getNameFromReverseResolverError).toBeUndefined();
   });
 
   it("should set and get text record from subdomain", async () => {
     const key = "snapshot";
     const value = "QmHash";
 
-    const setTextRecordVariables = {
-      domain: customTld,
-      resolver: resolverAddress,
-      key,
-      value,
-      network,
-    };
-
     const {
       data: setTextRecordData,
-      errors: setTextRecordErrors,
-    } = await ownerClient.query({
+      error: setTextRecordError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        mutation {
-          setTextRecord(
-            domain: $domain
-            resolverAddress: $resolver
-            key: $key
-            value: $value
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "setTextRecord",
+      args: {
+        domain: customTld,
+        resolverAddress,
+        key,
+        value,
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: setTextRecordVariables,
+      }
     });
 
-    expect(setTextRecordData?.setTextRecord).toBeDefined();
-    expect(setTextRecordErrors).toBeUndefined();
-
-    const getTextRecordVariables = {
-      domain: customTld,
-      resolver: resolverAddress,
-      key,
-      network,
-    };
+    expect(setTextRecordData).toBeDefined();
+    expect(setTextRecordError).toBeUndefined();
 
     const {
       data: getTextRecordData,
-      errors: getTextRecordErrors,
-    } = await ownerClient.query({
+      error: getTextRecordError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        query {
-          getTextRecord(
-            domain: $domain
-            resolverAddress: $resolver
-            key: $key
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "getTextRecord",
+      args: {
+        domain: customTld,
+        resolverAddress,
+        key,
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: getTextRecordVariables,
+      }
     });
 
-    expect(getTextRecordData?.getTextRecord).toEqual(value);
-    expect(getTextRecordErrors).toBeUndefined();
+    expect(getTextRecordData).toEqual(value);
+    expect(getTextRecordError).toBeUndefined();
   });
 
   it("should configure open domain", async () => {
-    const configureOpenDomainVariables = {
-      registry: ensAddress,
-      resolver: resolverAddress,
-      registrar: registrarAddress,
-      tld: openSubdomain,
-      owner,
-      network,
-    };
-
     const {
       data: configureOpenDomainData,
-      errors: configureOpenDomainErrors,
-    } = await ownerClient.query<{
-      configureOpenDomain: {
+      error: configureOpenDomainError,
+    } = await ownerClient.invoke<{
         fifsRegistrarAddress: string;
         setOwnerTxReceipt: any;
-      };
-    }>({
+      }>({
       uri: ensUri,
-      query: `
-        mutation {
-          configureOpenDomain(
-            tld: $tld,
-            owner: $owner,
-            registryAddress: $registry
-            resolverAddress: $resolver
-            registrarAddress: $registrar
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
-        }
-      `,
-      variables: configureOpenDomainVariables,
-    });
-
-    expect(configureOpenDomainData?.configureOpenDomain).toBeDefined();
-    expect(configureOpenDomainErrors).toBeUndefined();
-
-    const { data: getOwnerData } = await ownerClient.query({
-      uri: ensUri,
-      query: `
-        query {
-          getOwner(
-            domain: $tld,
-            registryAddress: $registry
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
-        }
-      `,
-      variables: {
+      method: "configureOpenDomain",
+      args: {
         tld: openSubdomain,
-        registry: ensAddress,
-        network,
-      },
+        owner,
+        registryAddress,
+        resolverAddress,
+        registrarAddress,
+        connection: {
+          networkNameOrChainId: network
+        }
+      }
     });
 
-    expect(getOwnerData?.getOwner).toEqual(
-      configureOpenDomainData?.configureOpenDomain.fifsRegistrarAddress
+    expect(configureOpenDomainData).toBeDefined();
+    expect(configureOpenDomainError).toBeUndefined();
+
+    const { data: getOwnerData } = await ownerClient.invoke({
+      uri: ensUri,
+      method: "getOwner",
+      args: {
+        domain: openSubdomain,
+        registryAddress,
+        connection: {
+          networkNameOrChainId: network
+        }
+      }
+    });
+
+    expect(getOwnerData).toEqual(
+      configureOpenDomainData?.fifsRegistrarAddress
     );
 
-    customFifsRegistrarAddress = configureOpenDomainData?.configureOpenDomain
-      .fifsRegistrarAddress!;
+    customFifsRegistrarAddress = configureOpenDomainData?.fifsRegistrarAddress!;
   });
 
   it("should create subdomain in open domain", async () => {
-    const createSubdomainInOpenDomainVariables = {
-      label: "label",
-      domain: openSubdomain,
-      fifsRegistrarAddress: customFifsRegistrarAddress,
-      registry: ensAddress,
-      owner: anotherOwner,
-      resolver: resolverAddress,
-      network,
-    };
-
     const {
       data: createSubdomainInOpenDomainData,
-      errors: createSubdomainInOpenDomainErrors,
-    } = await anotherOwnerClient.query({
+      error: createSubdomainInOpenDomainError,
+    } = await anotherOwnerClient.invoke({
       uri: ensUri,
-      query: `
-        mutation {
-          createSubdomainInOpenDomain(
-            label: $label,
-            domain: $domain,
-            owner: $owner,
-            fifsRegistrarAddress: $fifsRegistrarAddress,
-            registryAddress: $registry
-            resolverAddress: $resolver
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "createSubdomainInOpenDomain",
+      args: {
+        label: "label",
+        domain: openSubdomain,
+        owner: anotherOwner,
+        fifsRegistrarAddress: customFifsRegistrarAddress,
+        registryAddress,
+        resolverAddress,
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: createSubdomainInOpenDomainVariables,
+      }
     });
 
     expect(
-      createSubdomainInOpenDomainData?.createSubdomainInOpenDomain
+      createSubdomainInOpenDomainData
     ).toBeDefined();
-    expect(createSubdomainInOpenDomainErrors).toBeUndefined();
+    expect(createSubdomainInOpenDomainError).toBeUndefined();
   });
 
   it("should create subdomain in open domain and set content hash", async () => {
     const cid = "0x64EC88CA00B268E5BA1A35678A1B5316D212F4F366B2477232534A8AECA37F3C".toLowerCase();
-    const createSubdomainInOpenDomainAndSetContentHashVariables = {
-      label: "label2",
-      cid,
-      domain: openSubdomain,
-      fifsRegistrarAddress: customFifsRegistrarAddress,
-      registry: ensAddress,
-      owner: anotherOwner,
-      resolver: resolverAddress,
-      network,
-    };
 
     const {
       data: createSubdomainInOpenDomainAndSetContentHashData,
-      errors: createSubdomainInOpenDomainAndSetContentHashErrors,
-    } = await anotherOwnerClient.query({
+      error: createSubdomainInOpenDomainAndSetContentHashError,
+    } = await anotherOwnerClient.invoke({
       uri: ensUri,
-      query: `
-        mutation {
-          createSubdomainInOpenDomainAndSetContentHash(
-            cid: $cid,
-            label: $label,
-            domain: $domain,
-            owner: $owner,
-            fifsRegistrarAddress: $fifsRegistrarAddress,
-            registryAddress: $registry
-            resolverAddress: $resolver
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "createSubdomainInOpenDomainAndSetContentHash",
+      args: {
+        cid,
+        label: "label2",
+        domain: openSubdomain,
+        owner: anotherOwner,
+        fifsRegistrarAddress: customFifsRegistrarAddress,
+        registryAddress,
+        resolverAddress,
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: createSubdomainInOpenDomainAndSetContentHashVariables,
+      }
     });
 
     expect(
-      createSubdomainInOpenDomainAndSetContentHashData?.createSubdomainInOpenDomainAndSetContentHash
+      createSubdomainInOpenDomainAndSetContentHashData
     ).toBeDefined();
-    expect(createSubdomainInOpenDomainAndSetContentHashErrors).toBeUndefined();
-
-    const getContentHashFromDomainVariables = {
-      domain: "label2." + openSubdomain,
-      registry: ensAddress,
-      network,
-    };
+    expect(createSubdomainInOpenDomainAndSetContentHashError).toBeUndefined();
 
     const {
       data: getContentHashFromDomainData,
-      errors: getContentHashFromDomainErrors,
-    } = await ownerClient.query({
+      error: getContentHashFromDomainError,
+    } = await ownerClient.invoke({
       uri: ensUri,
-      query: `
-        query {
-          getContentHashFromDomain(
-            domain: $domain
-            registryAddress: $registry
-            connection: {
-              networkNameOrChainId: $network
-            }
-          )
+      method: "getContentHashFromDomain",
+      args: {
+        domain: "label2." + openSubdomain,
+        registryAddress,
+        connection: {
+          networkNameOrChainId: network
         }
-      `,
-      variables: getContentHashFromDomainVariables,
+      }
     });
 
-    expect(getContentHashFromDomainData?.getContentHashFromDomain).toEqual(cid);
-    expect(getContentHashFromDomainErrors).toBeUndefined();
+    expect(getContentHashFromDomainData).toEqual(cid);
+    expect(getContentHashFromDomainError).toBeUndefined();
   });
 });
