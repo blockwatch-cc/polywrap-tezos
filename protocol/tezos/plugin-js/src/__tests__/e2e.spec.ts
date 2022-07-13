@@ -34,8 +34,8 @@ describe("Tezos Plugin", () => {
               mainnet: {
                 provider: "https://rpc.tzstats.com"
               },
-              ithacanet: {
-                provider: "https://rpc.ithaca.tzstats.com"
+              ghostnet: {
+                provider: "https://rpc.ghost.tzstats.com"
               },
               testnet: {
                 provider: node.url,
@@ -345,13 +345,13 @@ describe("Tezos Plugin", () => {
         expect(response.data?.getOperationStatus.confirmations).toBeDefined()
       })
 
-      it("should get operation status on ithaca", async () => {
+      it("should get operation status on ghostnet", async () => {
         const response =  await client.query<{ getOperationStatus: QueryTypes.OperationStatus }>({
           uri,
           query: `
             query {
               getOperationStatus (
-                network: ithacanet, 
+                network: ghostnet, 
                 hash: "oot97Ak6cYpb3eofhQaTKpZLBoyeaYrb7xZSd2SoCv8GUXZT7sc"
               )
             }
