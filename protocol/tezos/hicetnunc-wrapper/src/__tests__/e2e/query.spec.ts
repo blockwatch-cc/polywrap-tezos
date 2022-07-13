@@ -37,7 +37,7 @@ describe("Query", () => {
                         provider: "https://rpc.ghost.tzstats.com",
                     }
                 },
-                defaultNetwork: "testnet"
+                defaultNetwork: "mainnet"
               })
         },
         ...getPlugins(testEnv.ipfs, testEnv.ensAddress, testEnv.ethereum),
