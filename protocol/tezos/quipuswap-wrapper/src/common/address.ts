@@ -13,18 +13,11 @@ export class Address {
     let connection: Tezos_Connection;
 
     switch (network) {
-      case Network.ithacanet: 
+      case Network.ghostnet: 
         contractAddress = "KT1PnmpVWmA5CBUsA5ZAx1HoDW67mPYurAL5";
         connection = <Tezos_Connection> {
-          provider: "https://rpc.ithaca.tzstats.com",
-          networkNameOrChainId: "ithacanet"  
-        }
-        break;
-      case Network.hangzhounet: 
-        contractAddress = "KT1Ni6JpXqGyZKXhJCPQJZ9x5x5bd7tXPNPC";
-        connection = <Tezos_Connection> {
-          provider: "https://rpc.hangzhou.tzstats.com",
-          networkNameOrChainId: "hangzhounet"  
+          provider: "https://rpc.ghost.tzstats.com",
+          networkNameOrChainId: "ghostnet"  
         }
         break;
       case Network.mainnet: 
