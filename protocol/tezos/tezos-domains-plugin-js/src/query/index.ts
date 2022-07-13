@@ -12,8 +12,7 @@ export class Query extends QuerySchema.Module<QueryConfig> {
   private static defaultNetwork: QuerySchema.NetworkString = "mainnet";
   private _connections: Record<QuerySchema.NetworkString, string> = {
     mainnet: 'https://rpc.tzstats.com',
-    hangzhounet: 'https://rpc.hangzhou.tzstats.com',
-    ithacanet: 'https://rpc.ithaca.tzstats.com',
+    ghostnet: 'https://rpc.ghost.tzstats.com',
   }
 
   constructor(config: QueryConfig) {
