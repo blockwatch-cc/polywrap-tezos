@@ -7,11 +7,7 @@ export const getRandomString = () => {
 }
 
 export const waitForConfirmation = async (client: PolywrapClient, hash: string, confirmations: number = 3) => {
-    const getSubscription: Subscription<{
-        getOperationStatus: Tezos_OperationStatus;
-      }> = client.subscribe<{
-        getOperationStatus: Tezos_OperationStatus;
-      }>({
+    const getSubscription: Subscription<Tezos_OperationStatus> = client.subscribe<Tezos_OperationStatus>({
         uri: "wrap://ens/tezos.polywrap.eth",
         method: "getOperationStatus",
         args: {
@@ -26,7 +22,7 @@ export const waitForConfirmation = async (client: PolywrapClient, hash: string, 
           continue
         }
         expect(query.error).toBeUndefined();
-        const operationStatus = query.data?.getOperationStatus;
+        const operationStatus = query.data;
         if (operationStatus !== undefined) {
           if (operationStatus.confirmations > confirmations) {
             break

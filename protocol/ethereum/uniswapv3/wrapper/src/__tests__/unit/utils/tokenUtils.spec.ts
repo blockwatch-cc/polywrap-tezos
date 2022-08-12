@@ -1,6 +1,6 @@
-import { ChainId, Currency, Token, TokenAmount } from "../../../query/w3";
-import { getNative, getWETH, isNative, wrapAmount, wrapToken } from "../../../query";
-import { BigInt } from "@web3api/wasm-as";
+import { ChainId, Currency, Token, TokenAmount } from "../../../wrap";
+import { getNative, getWETH, isNative, wrapAmount, wrapToken } from "../../..";
+import { BigInt } from "@polywrap/wasm-as";
 
 const Eth: Currency = {
   decimals: 18,
@@ -33,7 +33,7 @@ describe('Token utils', () => {
 
   it('getNative', () => {
     for (let i = ChainId.MAINNET; i < ChainId._MAX_; i++) {
-      const result: Token = i > 8 ? {
+      const result: Token = i == ChainId.POLYGON || i == ChainId.POLYGON_MUMBAI ? {
           chainId: i as ChainId,
           address: MATIC_ADDRESS,
           currency: MATIC,

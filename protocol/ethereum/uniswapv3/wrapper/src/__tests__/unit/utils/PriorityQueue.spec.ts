@@ -1,5 +1,5 @@
-import { PriorityQueue } from "../../../utils/PriorityQueue";
-import { BigInt } from "@web3api/wasm-as";
+import { PriorityQueue } from "../../../utils";
+import { BigInt } from "@polywrap/wasm-as";
 
 const comparator = (a: BigInt, b: BigInt): i32 => a.sub(b).toInt32();
 const values: BigInt[] = [

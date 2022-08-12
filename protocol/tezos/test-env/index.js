@@ -70,7 +70,7 @@ async function deployContract(account, contractInfo, confirmation = 1) {
   const signer = await getSigner(account.secretKey)
   const chainId = await client.rpc.getChainId()
   const rpcConstants = await client.rpc.getConstants()
-  const maxOperationsTTL = rpcConstants[Networks[chainId].maxOperationTTLKey] || 120;
+  const maxOperationsTTL = rpcConstants[Networks[chainId]?.maxOperationTTLKey] || 120;
   client.setSignerProvider(signer)
   client.setProvider({
     signer,

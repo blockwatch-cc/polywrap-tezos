@@ -1,3 +1,12 @@
+### How to add network support
+
+In the common case, adding support for a new chain is easy.
+You will need the address of the chain's WETH contract.
+1. Add network to ChainId enum in `src/schema.graphql`
+2. Update `_getWeth` in `src/token/utils.ts`
+3. If chain has its own native token, update `_getNative`, `_isNative`, and `_wrapToken` in `src/token/utils.ts`
+4. Update tests in `src/__tests__/unit/utils/tokenUtils.spec.ts`
+
 # The Uniswap v3 Wrapper
 
 Reference documentation for the Uniswap v3 wrapper is located at https://docs.polywrap.io/uniswapv3/intro.
@@ -7,6 +16,7 @@ The Uniswap v3 wrapper is a Polywrap-compatible API providing the same features 
 Polywrap wrappers are user-friendly, secure, scalable, and infinitely composable. They are designed to be seamlessly upgradeable and truly multi-platform. They are better SDK's.
 
 While the first Polywrap Client is written in JavaScript, future clients will be written for languages like Rust, Python, and Kotlin. Once written, a wrapper can be used with any Polywrap Client.
+
 
 ## The Polywrap Toolchain
 

@@ -1,4 +1,4 @@
-FROM oxheadalpha/flextesa:20220510
+FROM oxheadalpha/flextesa:20220715
 
 LABEL       vendor=Blockwatch\ Data\ Inc \
             maintainer="3sky <jakub@blockwatch.cc>" \

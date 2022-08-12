@@ -1,7 +1,7 @@
-import { ChainId, Token } from "../../../query/w3";
-import Price from "../../../utils/Price";
-import { BigInt } from "@web3api/wasm-as";
-import { _getWETH } from "../../../utils/tokenUtils";
+import { ChainId, Token } from "../../../wrap";
+import { Price } from "../../../utils";
+import { BigInt } from "@polywrap/wasm-as";
+import { _getWETH } from "../../../token";
 
 const USDC: Token = {
   chainId: ChainId.MAINNET,

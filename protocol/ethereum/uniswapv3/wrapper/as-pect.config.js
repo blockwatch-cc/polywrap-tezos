@@ -29,16 +29,16 @@ module.exports = {
    * Add your required AssemblyScript imports here.
    */
   imports: {
-    w3: {
-      __w3_invoke_args: () => {},
-      __w3_invoke_result: () => {},
-      __w3_invoke_error: () => {},
-      __w3_subinvoke: () => {},
-      __w3_subinvoke_result: () => {},
-      __w3_subinvoke_result_len: () => {},
-      __w3_subinvoke_error: () => {},
-      __w3_subinvoke_error_len: () => {},
-      __w3_abort: () => {},
+    wrap: {
+      __wrap_invoke_args: () => {},
+      __wrap_invoke_result: () => {},
+      __wrap_invoke_error: () => {},
+      __wrap_subinvoke: () => {},
+      __wrap_subinvoke_result: () => {},
+      __wrap_subinvoke_result_len: () => {},
+      __wrap_subinvoke_error: () => {},
+      __wrap_subinvoke_error_len: () => {},
+      __wrap_abort: () => {},
     }
   },
   /**
@@ -70,5 +70,4 @@ module.exports = {
    * To create your own custom reporter, please check out the Core API.
    */
   // reporter: new CustomReporter(),
-  coverage: ['src/mutation/*.ts', 'src/query/*.ts', 'src/utils/*.ts'],
 };

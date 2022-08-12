@@ -1,0 +1,18 @@
+format: 0.1.0
+displayName: Uniswap v3
+subtext: Uniswap v3 SDK->Wrapper
+description: Wrapper that provides all the functionality of the Uniswap v3 JavaScript SDK, and more!
+repository: https://github.com/polywrap/integrations/tree/main/uniswapv3/wrapper
+icon: ./meta/imgs/uniswap-pink.svg
+tags:
+  - uniswap
+  - defi
+  - demo
+  - sdk
+links:
+  - name: Polywrap
+    icon: ./meta/imgs/polywrap-horizontal.svg
+    url: https://polywrap.io
+  - name: Uniswap
+    icon: ./meta/imgs/uniswap-pink.svg
+    url: https://uniswap.org/

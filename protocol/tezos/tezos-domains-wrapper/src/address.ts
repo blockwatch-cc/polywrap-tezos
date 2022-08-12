@@ -18,14 +18,14 @@ export class Address {
     }
     switch (network) {
       case Network.ghostnet:
-        contractAddress = DefaultAddresses.get(`Ghostnet.${action}`);
+        contractAddress = DefaultAddresses.get(`Ghostnet.${action}`)!;
         connection = <Tezos_Connection> {
           provider: "https://rpc.ghost.tzstats.com",
           networkNameOrChainId: "ghostnet"
         };
         break;
       case Network.mainnet: 
-        contractAddress = DefaultAddresses.get(`Mainnet.${action}`);
+        contractAddress = DefaultAddresses.get(`Mainnet.${action}`)!;
         connection = <Tezos_Connection> {
           provider: "https://rpc.tzstats.com",
           networkNameOrChainId: "mainnet"

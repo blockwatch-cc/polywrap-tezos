@@ -1,6 +1,0 @@
-query {
-  fetchToken(
-    address: $address
-    chainId: $chainId
-  )
-}

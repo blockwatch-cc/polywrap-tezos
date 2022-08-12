@@ -1,5 +1,0 @@
-query {
-  toHex(
-    value: $value
-  )
-}
