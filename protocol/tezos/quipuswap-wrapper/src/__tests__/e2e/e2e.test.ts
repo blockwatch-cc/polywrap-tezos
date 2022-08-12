@@ -15,7 +15,7 @@ describe("e2e", () => {
 
   beforeAll(async () => {
     const apiPath = path.join(__dirname, "/../../..");
-    apiUri = `fs/${apiPath}/build`;
+    apiUri = `fs/${apiPath}`;
     
     await buildWrapper(apiPath);
     client = new PolywrapClient({
@@ -28,8 +28,7 @@ describe("e2e", () => {
                         provider: "https://rpc.tzstats.com"
                     },
                     ghostnet: {
-                        provider: "https://rpc.ghost.tzstats.com",
-                        signer
+                        provider: "https://rpc.ghost.tzstats.com"
                     }
                 },
                 defaultNetwork: "ghostnet"
@@ -127,16 +126,15 @@ describe("e2e", () => {
 
   describe("addOperator", () => {
     it("should add operator", async () => {
-      const contractAddress = "KT1PnmpVWmA5CBUsA5ZAx1HoDW67mPYurAL5";
       const response = await client.invoke<{ addOperator: Tezos_TransferParams }>({
         uri: apiUri,
         method: "addOperator",
         args: {
           network: "ghostnet",
-          contractAddress,
+          contractAddress: "KT1Ni6JpXqGyZKXhJCPQJZ9x5x5bd7tXPNPC",
           params: {
             tokenId: 0,
-            operator: contractAddress
+            operator: "KT1Ni6JpXqGyZKXhJCPQJZ9x5x5bd7tXPNPC"
           }
         }
       })
@@ -150,16 +148,15 @@ describe("e2e", () => {
   
   describe("removeOperator", () => {
     it("should remove operator", async () => {
-      const contractAddress = "KT1PnmpVWmA5CBUsA5ZAx1HoDW67mPYurAL5";
       const response = await client.invoke<{ removeOperator: Tezos_TransferParams }>({
         uri: apiUri,
         method: "removeOperator",
         args: {
           network: "ghostnet",
-          contractAddress,
+          contractAddress: "KT1Ni6JpXqGyZKXhJCPQJZ9x5x5bd7tXPNPC",
           params: {
             tokenId: 0,
-            operator: contractAddress
+            operator: "KT1Ni6JpXqGyZKXhJCPQJZ9x5x5bd7tXPNPC"
           }
         }
       })

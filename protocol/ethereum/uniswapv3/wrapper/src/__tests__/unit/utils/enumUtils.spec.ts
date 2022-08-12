@@ -1,6 +1,6 @@
-import { getFeeAmountEnum } from "../../../utils";
-import { FeeAmount, PermitV } from "../../../wrap";
-import { feeAmountToTickSpacing, getFeeAmount, getPermitV } from "../../..";
+import { getFeeAmountEnum } from "../../../utils/enumUtils";
+import { FeeAmount, PermitV } from "../../../query/w3";
+import { feeAmountToTickSpacing, getFeeAmount, getPermitV } from "../../../query";
 
 describe('Enum utils', () => {
 

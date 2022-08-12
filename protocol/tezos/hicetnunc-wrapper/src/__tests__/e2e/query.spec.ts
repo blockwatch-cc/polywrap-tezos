@@ -1,5 +1,5 @@
 import path from "path"
-import { tezosPlugin } from "../../../../plugin-js"
+import { tezosPlugin } from "@blockwatch-cc/tezos-plugin-js"
 import { PolywrapClient } from "@polywrap/client-js"
 import { buildWrapper } from "@polywrap/test-env-js"
 

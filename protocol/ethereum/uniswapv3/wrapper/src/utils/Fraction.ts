@@ -2,9 +2,10 @@
 
 import { Rounding } from "./enumUtils";
 
-import { BigInt, BigNumber, Rounding as BNRounding } from "@polywrap/wasm-as";
+import { BigInt } from "@web3api/wasm-as";
+import { BigFloat } from "as-bigfloat";
 
-export class Fraction {
+export default class Fraction {
   public readonly numerator: BigInt;
   public readonly denominator: BigInt;
 
@@ -111,10 +112,10 @@ export class Fraction {
         significantDigits.toString() + " is not a positive integer."
       );
     }
-    return BigNumber.fromFraction(
+    return BigFloat.fromFraction(
       this.numerator,
       this.denominator
-    ).toSignificant(significantDigits, Fraction.mapRounding(rounding));
+    ).toSignificant(significantDigits, rounding);
   }
 
   public toFixed(
@@ -124,20 +125,9 @@ export class Fraction {
     if (decimalPlaces < 0) {
       throw new Error(decimalPlaces.toString() + " is negative.");
     }
-    return BigNumber.fromFraction(this.numerator, this.denominator).toFixed(
+    return BigFloat.fromFraction(this.numerator, this.denominator).toFixed(
       decimalPlaces,
-      Fraction.mapRounding(rounding)
+      rounding
     );
-  }
-
-  private static mapRounding(rounding: Rounding): BNRounding {
-    switch (rounding) {
-      case Rounding.ROUND_DOWN:
-        return BNRounding.DOWN;
-      case Rounding.ROUND_UP:
-        return BNRounding.UP;
-      default:
-        return BNRounding.HALF_UP;
-    }
   }
 }

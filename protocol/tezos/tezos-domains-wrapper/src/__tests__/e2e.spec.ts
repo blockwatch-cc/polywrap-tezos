@@ -5,7 +5,6 @@ import { InMemorySigner } from "@taquito/signer"
 import { buildWrapper } from "@polywrap/test-env-js"
 
 import { Config } from "./config"
-import { tezosDomainsPlugin } from "../../../tezos-domains-plugin-js"
 import { getRandomString, waitForConfirmation } from "./testUtils"
 import { DomainInfo, Tezos_TxOperation } from "./types/wrap";
 const { tezosPlugin } = require("../../../tezos-domains-plugin-js")
@@ -13,38 +12,34 @@ const { tezosPlugin } = require("../../../tezos-domains-plugin-js")
 jest.setTimeout(600000)
 
 describe("Tezos Domains Wrapper", () => {
-  const { TZ_PKH: PKH, TZ_SECRET_KEY } = Config;
+  const PKH = Config.TZ_PKH;
   let client: PolywrapClient;
   let apiUri: string;
 
   beforeAll(async () => {
     const apiPath = path.join(__dirname, "/../..");
-    apiUri = `fs/${apiPath}/build`;
+    apiUri = `fs/${apiPath}`;
 
     await buildWrapper(apiPath);
 
-    const signer = await InMemorySigner.fromSecretKey(TZ_SECRET_KEY);
+    const signer = await InMemorySigner.fromSecretKey(Config.TZ_SECRET_KEY);
     client = new PolywrapClient({
       plugins: [
-        {
-          uri: "wrap://ens/tezosDomainsPlugin.polywrap.eth",
-          plugin: tezosDomainsPlugin({ defaultNetwork: "ghostnet" })
-        },
         {
           uri: "wrap://ens/tezos.polywrap.eth",
           plugin: tezosPlugin({
               networks: {
-                mainnet: {
-                  provider: "https://rpc.tzstats.com"
-                },
-                ghostnet: {
-                  provider: "https://rpc.ghost.tzstats.com",
-                  signer
-                }
-            },
-            defaultNetwork: "ghostnet"
-          })
-        }
+                  mainnet: {
+                      provider: "https://rpc.tzstats.com"
+                  },  
+                  ghostnet: {
+                      provider: "https://rpc.ghost.tzstats.com",
+                      signer,
+                  }
+              },
+              defaultNetwork: "ghostnet"
+            })
+        },
       ]
     })
   })

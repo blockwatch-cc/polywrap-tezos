@@ -1,6 +1,6 @@
 import { BigInt } from "as-bigint";
 
-import { Fraction } from "../../../utils";
+import Fraction from "../../../utils/Fraction";
 
 describe('Fraction', () => {
   describe('qoutient', () => {

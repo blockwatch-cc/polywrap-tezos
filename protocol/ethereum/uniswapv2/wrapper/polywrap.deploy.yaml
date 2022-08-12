@@ -1,7 +1,5 @@
-format: 0.1.0
+format: 0.0.1
 stages:
   ipfs_deploy:
     package: ipfs
     uri: fs/./build
-    config:
-      gatewayUri: 'ipfs.wrappers.io'

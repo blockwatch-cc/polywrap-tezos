@@ -33,8 +33,6 @@ describe("Swap", () => {
   let dai: App.Token;
   let weth: App.Token;
   let usdc: App.Token;
-  let usdt: App.Token;
-  let wbtc: App.Token;
 
   beforeAll(async () => {
     await initInfra();
@@ -47,17 +45,18 @@ describe("Swap", () => {
     ethersProvider = ethers.providers.getDefaultProvider("http://localhost:8546") as providers.JsonRpcProvider;
     recipient = await ethersProvider.getSigner().getAddress();
 
-    // set up test case data
+    // set up test case data -> pairs
     tokens = await getTokenList();
+
     dai = tokens.filter(token => token.currency.symbol === "DAI")[0];
+    const daiTxResponse: App.Ethereum_TxResponse = await approveToken(dai, client, fsUri);
+    const daiApproveTx = await ethersProvider.getTransaction(daiTxResponse.hash);
+    await daiApproveTx.wait();
+
     usdc = tokens.filter(token => token.currency.symbol === "USDC")[0];
-    usdt = tokens.filter(token => token.currency.symbol === "USDT")[0];
-    wbtc = tokens.filter(token => token.currency.symbol === "WBTC")[0];
-    for (const token of [dai, usdc, usdt, wbtc]) {
-      const txResponse: App.Ethereum_TxResponse = await approveToken(token, client, fsUri);
-      const approveTx = await ethersProvider.getTransaction(txResponse.hash);
-      await approveTx.wait();
-    }
+    const usdcTxResponse = await approveToken(usdc, client, fsUri);
+    const usdcApproveTx = await ethersProvider.getTransaction(usdcTxResponse.hash);
+    await usdcApproveTx.wait();
 
     weth = tokens.filter(token => token.currency.symbol === "WETH")[0];
     ethCurrency = {
@@ -82,6 +81,8 @@ describe("Swap", () => {
     const etherDaiOut = "1000000000000000000000"; // $1,000
     const daiUsdcIn = "100000000000000000000"; // $100
     const usdcEthIn = "10000000"; // $10;
+    const daiUsdcSwapOut = "10000000"; // $10
+    const usdcDaiSwapIn = "10000000"; // $10
     
     // EXEC eth -> dai
     const etherDaiAmountOut: App.TokenAmount = {
@@ -134,62 +135,23 @@ describe("Swap", () => {
     // CHECK usdc -> eth
     const usdcBalanceAfterUsdcEth: ethers.BigNumber = await usdcContract.balanceOf(recipient);
     expect(usdcBalanceAfterUsdcEth.lt(usdcBalance)).toBeTruthy();
-  });
 
-  it("Should successfully SWAP ether -> usdt -> wbtc -> ether", async () => {
-    const usdtContract = new Contract(usdt.address, erc20ABI, ethersProvider);
-    const wbtcContract = new Contract(wbtc.address, erc20ABI, ethersProvider);
+    // SWAP dai -> usdc
+    const daiUsdcSwapTxResponse = await execSwap(dai, usdc, daiUsdcSwapOut, App.TradeTypeEnum.EXACT_OUTPUT, getTradeOptions(recipient), client, fsUri);
+    const daiUsdcSwapTx = await ethersProvider.getTransaction(daiUsdcSwapTxResponse.hash);
+    await daiUsdcSwapTx.wait();
+    // CHECK dai -> usdc swap
+    const usdcBalanceAfterDaiUsdcSwap: ethers.BigNumber = await usdcContract.balanceOf(recipient);
+    const expectedUsdcBalanceAfterDaiUsdcSwap = usdcBalanceAfterUsdcEth.add(daiUsdcSwapOut);
+    expect(usdcBalanceAfterDaiUsdcSwap.toString()).toBe(expectedUsdcBalanceAfterDaiUsdcSwap.toString());
+    expect((await daiContract.balanceOf(recipient)).lt(daiBalanceAfterDaiUsdc)).toBeTruthy();
 
-    const ethToken: App.Token = {
-      chainId: App.ChainIdEnum.MAINNET,
-      address: "",
-      currency: ethCurrency,
-    }
-
-    const ethUsdtIn = "1000000000000000000"; // 1 Eth
-    const usdtWbtcIn = "500000000"; // $500
-    const wbtcEthOut = "100000000000000000"; // 0.1 Eth;
-
-    // EXEC eth -> Usdt
-    const ethUsdtStart = await ethersProvider.getBalance(recipient);
-    const ethUsdtTxResponse = await execSwap(ethToken, usdt, ethUsdtIn, App.TradeTypeEnum.EXACT_INPUT, getTradeOptions(recipient), client, fsUri);
-    const ethUsdtTx = await ethersProvider.getTransaction(ethUsdtTxResponse.hash);
-    await ethUsdtTx.wait();
-    const ethUsdtEnd = await ethersProvider.getBalance(recipient);
-    // CHECK eth -> usdt
-    // bounding tests to account for unknown gas cost
-    const ethUsdtUpper = ethUsdtStart.sub(ethUsdtIn);
-    const ethUsdtLower = ethUsdtStart.sub(ethUsdtIn).sub("10000000000000000");
-    expect(ethUsdtEnd.lte(ethUsdtUpper)).toBeTruthy();
-    expect(ethUsdtEnd.gte(ethUsdtLower)).toBeTruthy();
-
-    // EXEC Usdt -> wbtc
-    const usdtWbtcStart: ethers.BigNumber = await usdtContract.balanceOf(recipient);
-    const usdtWbtcTxResponse = await execSwap(usdt, wbtc, usdtWbtcIn, App.TradeTypeEnum.EXACT_INPUT, getTradeOptions(recipient), client, fsUri);
-    const usdtWbtcTx = await ethersProvider.getTransaction(usdtWbtcTxResponse.hash);
-    await usdtWbtcTx.wait();
-    // CHECK usdt -> wbtc
-    const usdtWbtcEnd: ethers.BigNumber = await usdtContract.balanceOf(recipient);
-    const expectedUsdtAfterUsdtWbtc = usdtWbtcStart.sub(usdtWbtcIn);
-    expect(usdtWbtcEnd.eq(expectedUsdtAfterUsdtWbtc)).toBeTruthy();
-    const wbtcBalance = await wbtcContract.balanceOf(recipient);
-    expect(wbtcBalance.gte(0)).toBeTruthy();
-
-    // EXEC wbtc -> eth
-    const wbtcEthStart = await ethersProvider.getBalance(recipient);
-    const wbtcEthTxResponse =  await execSwap(wbtc, ethToken, wbtcEthOut, App.TradeTypeEnum.EXACT_OUTPUT, getTradeOptions(recipient), client, fsUri);
-    const wbtcEthTx = await ethersProvider.getTransaction(wbtcEthTxResponse.hash);
-    await wbtcEthTx.wait();
-    const wbtcEthEnd = await ethersProvider.getBalance(recipient);
-    // CHECK wbtc -> eth
-    // bounding tests to account for unknown gas cost
-    const wbtcEthUpper = wbtcEthStart.add(wbtcEthOut);
-    const wbtcEthLower = wbtcEthStart.add(wbtcEthOut).sub("10000000000000000");
-    expect(wbtcEthEnd.lte(wbtcEthUpper)).toBeTruthy();
-    expect(wbtcEthEnd.gte(wbtcEthLower)).toBeTruthy();
-    // expect to have less wbtc
-    const wbtcBalanceAfterWbtcEth: ethers.BigNumber = await wbtcContract.balanceOf(recipient);
-    expect(wbtcBalanceAfterWbtcEth.lt(wbtcBalance)).toBeTruthy();
+    // SWAP usdc -> dai
+    const usdcDaiSwapTxResponse = await execSwap(usdc,dai, usdcDaiSwapIn, App.TradeTypeEnum.EXACT_INPUT, getTradeOptions(recipient), client, fsUri);
+    const usdcDaiSwapTx = await ethersProvider.getTransaction(usdcDaiSwapTxResponse.hash);
+    await usdcDaiSwapTx.wait();
+    // CHECK usdc -> dai swap
+    expect((await usdcContract.balanceOf(recipient)).toString()).toEqual(usdcBalanceAfterUsdcEth.toString());
   });
 });
 

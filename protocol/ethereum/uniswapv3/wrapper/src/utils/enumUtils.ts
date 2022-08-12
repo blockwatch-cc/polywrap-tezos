@@ -1,28 +1,10 @@
-import {
-  FeeAmount,
-  PermitV,
-  Args_feeAmountToTickSpacing,
-  Args_getFeeAmount,
-  Args_getPermitV,
-} from "../wrap";
+import { FeeAmount, PermitV } from "../query/w3";
 
 export enum Rounding {
   ROUND_DOWN,
   ROUND_HALF_UP,
   ROUND_UP,
   _MAX_,
-}
-
-export function feeAmountToTickSpacing(args: Args_feeAmountToTickSpacing): i32 {
-  return _feeAmountToTickSpacing(args.feeAmount);
-}
-
-export function getFeeAmount(args: Args_getFeeAmount): u32 {
-  return _getFeeAmount(args.feeAmount);
-}
-
-export function getPermitV(args: Args_getPermitV): i32 {
-  return _getPermitV(args.permitV);
 }
 
 export function _feeAmountToTickSpacing(feeAmount: FeeAmount): i32 {

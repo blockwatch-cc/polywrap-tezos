@@ -1,0 +1,15 @@
+{
+    "chainId": "",
+    "inputTokenAddress": "",
+    "inputTokenDecimals": "",
+    "outputTokenAddress": "",
+    "outputTokenDecimals": "",
+    "fee": "",
+    "amount": "",
+    "tradeType": "",
+    "slippageTolerance": "",
+    "recipient": "",
+    "deadline": "",
+    "gasPrice": "",
+    "gasLimit": ""
+}

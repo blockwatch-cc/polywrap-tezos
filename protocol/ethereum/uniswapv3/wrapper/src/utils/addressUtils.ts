@@ -1,5 +1,5 @@
 // https://github.com/ethers-io/ethers.js/blob/master/packages/address/src.ts/index.ts#L143
-import { SHA3_Module } from "../wrap";
+import { SHA3_Query } from "../query/w3";
 
 export function getChecksumAddress(address: string): string {
   if (address.startsWith("0x")) {
@@ -13,7 +13,7 @@ export function getChecksumAddress(address: string): string {
     expanded[i] = chars[i].charCodeAt(0);
   }
 
-  const hashed: string = SHA3_Module.buffer_keccak_256({
+  const hashed: string = SHA3_Query.buffer_keccak_256({
     message: expanded.buffer,
   }).unwrap();
   const hashedArr: Uint8Array = arrayify(hashed);

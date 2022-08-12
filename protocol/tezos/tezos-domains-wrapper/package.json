@@ -2,7 +2,7 @@
   "name": "@blockwatch-cc/tezos-domains-wrapper",
   "description": "Tezos Domains Polywrapper",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.1.1",
   "scripts": {
     "reset": "yarn clean && yarn build",
     "clean": "npx rimraf ./node_modules ./build ./coverage ./.wrap ./**/wrap",
@@ -18,13 +18,13 @@
     "deploy:web3api": "npx polywrap build --ipfs http://localhost:5001 --test-ens harbinger.web3api.eth"
   },
   "devDependencies": {
-    "@taquito/signer": "13.0.1",
+    "@taquito/signer": "12.1.0",
     "@types/jest": "27.4.0",
     "@types/node": "17.0.8",
-    "polywrap": "0.2.0",
-    "@polywrap/client-js": "0.2.0",
-    "@polywrap/test-env-js": "0.2.0",
-    "@polywrap/wasm-as": "0.2.0",
+    "polywrap": "0.1.1",
+    "@polywrap/client-js": "0.1.1",
+    "@polywrap/test-env-js": "0.1.1",
+    "@polywrap/wasm-as": "0.1.1",
     "assemblyscript": "0.19.1",
     "dotenv": "16.0.0",
     "jest": "27.4.7",

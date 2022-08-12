@@ -8,7 +8,6 @@ import {
   Ethereum_TxResponse,
   getChainIdKey,
   Pair,
-  Route,
   SwapParameters,
   Trade,
   TradeType,
@@ -17,8 +16,7 @@ import {
 import { getSwapMethodAbi, UNISWAP_ROUTER_CONTRACT } from "../utils";
 import { swapCallParameters, toHex } from "./router";
 import { fetchPairData } from "./fetch";
-import { createTrade } from "./trade";
-import { createRoute } from "./route";
+import { bestTradeExactIn, bestTradeExactOut } from "./trade";
 
 import { BigInt } from "@polywrap/wasm-as";
 
@@ -62,24 +60,34 @@ export function execCall(args: Args_execCall): Ethereum_TxResponse {
 }
 
 export function swap(args: Args_swap): Ethereum_TxResponse {
+  let trade: Trade;
   const pair: Pair = fetchPairData({
     token0: args.tokenIn,
     token1: args.tokenOut,
   });
-  const route: Route = createRoute({
-    pairs: [pair],
-    input: args.tokenIn,
-    output: args.tokenOut,
-  });
-  const trade: Trade = createTrade({
-    route,
-    amount: {
-      token:
-        args.tradeType == TradeType.EXACT_INPUT ? args.tokenIn : args.tokenOut,
-      amount: args.amount,
-    },
-    tradeType: args.tradeType,
-  });
+
+  if (args.tradeType == TradeType.EXACT_INPUT) {
+    trade = bestTradeExactIn({
+      pairs: [pair],
+      amountIn: {
+        token: args.tokenIn,
+        amount: args.amount,
+      },
+      tokenOut: args.tokenOut,
+      options: null,
+    })[0];
+  } else {
+    trade = bestTradeExactOut({
+      pairs: [pair],
+      amountOut: {
+        token: args.tokenOut,
+        amount: args.amount,
+      },
+      tokenIn: args.tokenIn,
+      options: null,
+    })[0];
+  }
+
   return exec({
     trade: trade,
     tradeOptions: args.tradeOptions,

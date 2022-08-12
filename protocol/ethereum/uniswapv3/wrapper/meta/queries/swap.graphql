@@ -1,0 +1,34 @@
+mutation {
+  swap(
+    inToken: {
+      chainId: $chainId
+      address: $inputTokenAddress
+      currency: {
+        decimals: $inputTokenDecimals
+        symbol: null
+        name: null
+      }
+    }
+    outToken: {
+      chainId: $chainId
+      address: $outputTokenAddress
+      currency: {
+        decimals: $outputTokenDecimals
+        symbol: null
+        name: null
+      }
+    }
+    fee: $fee
+    amount: $amount
+    tradeType: $tradeType
+    swapOptions: {
+      slippageTolerance: $slippageTolerance
+      recipient: $recipient
+      deadline: $deadline
+    }
+    gasOptions: {
+      gasPrice: $gasPrice
+      gasLimit: $gasLimit
+    }
+  )
+}

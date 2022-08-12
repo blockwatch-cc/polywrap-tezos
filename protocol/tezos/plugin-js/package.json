@@ -1,7 +1,7 @@
 {
   "name": "@blockwatch-cc/tezos-plugin-js",
   "description": "Tezos Polywrap JS Plugin",
-  "version": "0.2.0",
+  "version": "0.1.1",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -22,22 +22,23 @@
     "test:watch": "jest --watch --passWithNoTests --verbose"
   },
   "dependencies": {
-    "@taquito/signer": "13.0.1",
-    "@taquito/tzip16": "13.0.1",
-    "@taquito/taquito": "13.0.1",
-    "@taquito/michel-codec": "13.0.1",
-    "@taquito/michelson-encoder": "13.0.1",
-    "@taquito/utils": "13.0.1",
-    "@polywrap/core-js": "0.2.0",
+    "@taquito/signer": "12.1.0",
+    "@taquito/tzip16": "12.1.0",
+    "@taquito/taquito": "12.1.0",
+    "@taquito/michel-codec": "12.1.0",
+    "@taquito/michelson-encoder": "12.1.0",
+    "@taquito/utils": "12.1.0",
+    "@polywrap/core-js": "0.1.1",
     "@temple-wallet/dapp": "7.0.0",
     "axios": "0.25.0"
   },
   "devDependencies": {
     "@types/jest": "26.0.8",
-    "@polywrap/client-js": "0.2.0",
-    "@polywrap/ipfs-plugin-js": "0.2.0",
-    "@polywrap/test-env-js": "0.2.0",
-    "polywrap": "0.2.0",
+    "@polywrap/client-js": "0.1.1",
+    "@polywrap/ens-plugin-js": "0.0.1-prealpha.89",
+    "@polywrap/ipfs-plugin-js": "0.1.1",
+    "@polywrap/test-env-js": "0.1.1",
+    "polywrap": "0.1.1",
     "jest": "26.6.3",
     "js-sha3": "0.8.0",
     "rimraf": "3.0.2",
